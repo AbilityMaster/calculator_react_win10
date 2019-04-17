@@ -30,19 +30,35 @@ export default class ButtonArea extends Component {
         },
         percentBtn: {
             style: 'calc__button calc__button_percent js-calc__button_percent',
-            dataAttribute: OPERATIONS.ADDITIONAL.PERCENT
+            dataAttribute: OPERATIONS.ADDITIONAL.PERCENT,
+            percent: () => {
+                const { percent } = this.props;
+                percent();
+            }
         },
         sqrtBtn: {
             style: 'calc__button calc__button_sqrt js-calc__button_sqrt',
-            dataAttribute: OPERATIONS.ADDITIONAL.SQRT
+            dataAttribute: OPERATIONS.ADDITIONAL.SQRT,
+            singleOperation: (data) => {
+                const { singleOperation } = this.props;
+                singleOperation(data);
+            }
         },
         powBtn: {
             style: 'calc__button calc__button_pow js-calc__button_pow',
-            dataAttribute: OPERATIONS.ADDITIONAL.POW
+            dataAttribute: OPERATIONS.ADDITIONAL.POW,
+            singleOperation: (data) => {
+                const { singleOperation } = this.props;
+                singleOperation(data);
+            }
         },
         fracBtn: {
             style: 'calc__button calc__button_frac js-calc__button_frac',
-            dataAttribute: OPERATIONS.ADDITIONAL.FRAC
+            dataAttribute: OPERATIONS.ADDITIONAL.FRAC,
+            singleOperation: (data) => {
+                const { singleOperation } = this.props;
+                singleOperation(data);
+            }
         },
         ceBtn: {
             style: 'calc__button calc__button_disabled',
@@ -50,89 +66,118 @@ export default class ButtonArea extends Component {
         },
         clearBtn: {
             style: 'calc__button calc__button_clear js-calc__button_clear',
-            dataAttribute: OPERATIONS.ADDITIONAL.CLEAR
+            dataAttribute: OPERATIONS.ADDITIONAL.CLEAR,
+            clear: () => {
+                const { clear } = this.props;
+                clear();
+            }
         },
         backspaceBtn: {
             style: 'calc__button calc__button_backspace js-calc__button_backspace',
-            dataAttribute: OPERATIONS.ADDITIONAL.BACKSPACE
+            dataAttribute: OPERATIONS.ADDITIONAL.BACKSPACE,
+            backspace: () => {
+                const { backspace } = this.props;
+                backspace();
+            }
         },
         operationBtn: {
             style: 'calc__button calc__button_operation js-calc__button_operation',
             dataAttribute: OPERATIONS.ADDITIONAL.DIVIDE
         },
         number: {
-            type: 'number',
             style: 'calc__button calc__button_number js-calc__button_number',
-            dataAttribute: 'number'
+            dataAttribute: 'number',
+            updateDisplayValue: value => {
+                const { updateDisplayValue } = this.props;
+                updateDisplayValue(value);
+            }
         },
         operation: {
-            type: 'operation',
             style: 'calc__button calc__button_operation js-calc__button_operation',
-            dataAttribute: ''
+            dataAttribute: 'operation',
+            operation: typeOperation => {
+                const { operation } = this.props;
+                operation(typeOperation);
+            }
         },
         reverseBtn: {
             style: 'calc__button calc__button_reverse js-calc__button_reverse',
-            dataAttribute: OPERATIONS.ADDITIONAL.REVERSE
+            dataAttribute: OPERATIONS.ADDITIONAL.REVERSE,
+            reverse: () => {
+                const { reverse } = this.props;
+                reverse();
+            }
         },
         addPointBtn: {
             style: 'calc__button calc__button_add-point js-calc__button_add-point',
-            dataAttribute: OPERATIONS.ADDITIONAL.POINT
+            dataAttribute: OPERATIONS.ADDITIONAL.POINT,
+            addPoint: () => {
+                const { addPoint } = this.props;
+                addPoint();
+            }
         },
         resultBtn: {
             style: 'calc__button calc__button_get-result js-calc__button_get-result',
-            dataAttribute: OPERATIONS.ADDITIONAL.RESULT
+            dataAttribute: OPERATIONS.ADDITIONAL.RESULT,
+            result: () => {
+                const { result } = this.props;
+                result();
+            }
         }
     }
+
     render() {
+        const { isDisabled } = this.props;
+
         return (
             <div className="button-area js-button-area">
-            <div className="calc calc-add">
-                <Button btnSettings={this.btnSettings.memoryClearButton}>MC</Button>
-                <Button btnSettings={this.btnSettings.memoryReadButton}>MR</Button>
-                <Button btnSettings={this.btnSettings.memoryPlusButton}>M<span>+</span></Button>
-                <Button btnSettings={this.btnSettings.memoryMinusButton}>M<span>-</span></Button>
-                <Button btnSettings={this.btnSettings.memorySaveButton}>MS</Button>
-                <Button btnSettings={this.btnSettings.memoryOpenButton}>M</Button>
+                <div className="calc calc-add">
+                    <Button btnSettings={this.btnSettings.memoryClearButton}>MC</Button>
+                    <Button btnSettings={this.btnSettings.memoryReadButton}>MR</Button>
+                    <Button btnSettings={this.btnSettings.memoryPlusButton}>M<span>+</span></Button>
+                    <Button btnSettings={this.btnSettings.memoryMinusButton}>M<span>-</span></Button>
+                    <Button btnSettings={this.btnSettings.memorySaveButton}>MS</Button>
+                    <Button btnSettings={this.btnSettings.memoryOpenButton}>M</Button>
+                </div>
+                <div className="calc">
+                    <Button isDisabled={isDisabled} btnSettings={this.btnSettings.percentBtn}>%</Button>
+                    <Button isDisabled={isDisabled} btnSettings={this.btnSettings.sqrtBtn}>√</Button>
+                    <Button isDisabled={isDisabled} btnSettings={this.btnSettings.powBtn}><span className="span">x</span></Button>
+                    <Button isDisabled={isDisabled} btnSettings={this.btnSettings.fracBtn}><span className="span">/</span></Button>
+                </div>
+                <div className="calc">
+                    <Button btnSettings={this.btnSettings.ceBtn}>CE</Button>
+                    <Button btnSettings={this.btnSettings.clearBtn}>C</Button>
+                    <Button btnSettings={this.btnSettings.backspaceBtn}>{`<-`}</Button>
+                    <Button isDisabled={isDisabled} btnSettings={this.btnSettings.operation}>÷</Button>
+                </div>
+                <div className="calc">
+                    <Button btnSettings={this.btnSettings.number}>7</Button>
+                    <Button btnSettings={this.btnSettings.number}>8</Button>
+                    <Button btnSettings={this.btnSettings.number}>9</Button>
+                    <Button isDisabled={isDisabled} btnSettings={this.btnSettings.operation}>*</Button>
+                </div>
+                <div className="calc">
+                    <Button btnSettings={this.btnSettings.number}>4</Button>
+                    <Button btnSettings={this.btnSettings.number}>5</Button>
+                    <Button btnSettings={this.btnSettings.number}>6</Button>
+                    <Button isDisabled={isDisabled} btnSettings={this.btnSettings.operation}>-</Button>
+                </div>
+                <div className="calc">
+                    <Button btnSettings={this.btnSettings.number}>1</Button>
+                    <Button btnSettings={this.btnSettings.number}>2</Button>
+                    <Button btnSettings={this.btnSettings.number}>3</Button>
+                    <Button isDisabled={isDisabled} btnSettings={this.btnSettings.operation}>+</Button>
+                </div>
+                <div className="calc">
+                    <Button isDisabled={isDisabled} btnSettings={this.btnSettings.reverseBtn}>±</Button>
+                    <Button btnSettings={this.btnSettings.number}>0</Button>
+                    <Button isDisabled={isDisabled} btnSettings={this.btnSettings.addPointBtn}>,</Button>
+                    <Button isDisabled={isDisabled} btnSettings={this.btnSettings.resultBtn}>=</Button>
+                </div>
+                <div className="memory js-memory">
+                </div>
             </div>
-            <div className="calc">
-                <Button btnSettings={this.btnSettings.percentBtn}>%</Button>
-                <Button btnSettings={this.btnSettings.sqrtBtn}>√</Button>
-                <Button btnSettings={this.btnSettings.powBtn}><span className="span">x</span></Button>
-                <Button btnSettings={this.btnSettings.fracBtn}><span className="span">/</span></Button>
-            </div>
-            <div className="calc">
-                <Button btnSettings={this.btnSettings.ceBtn}>CE</Button>
-                <Button btnSettings={this.btnSettings.clearBtn}>C</Button>
-                <Button btnSettings={this.btnSettings.backspaceBtn}>{`<-`}</Button>
-                <Button btnSettings={this.btnSettings.operationBtn}>÷</Button>
-            </div>
-            <div className="calc">
-                <Button btnSettings={this.btnSettings.number}>7</Button>
-                <Button btnSettings={this.btnSettings.number}>8</Button>
-                <Button btnSettings={this.btnSettings.number}>9</Button>
-                <Button btnSettings={this.btnSettings.operation}>*</Button>
-            </div>
-            <div className="calc">
-                <Button btnSettings={this.btnSettings.number}>4</Button>
-                <Button btnSettings={this.btnSettings.number}>5</Button>
-                <Button btnSettings={this.btnSettings.number}>6</Button>
-                <Button btnSettings={this.btnSettings.operation}>-</Button>
-            </div>
-            <div className="calc">
-                <Button btnSettings={this.btnSettings.number}>1</Button>
-                <Button btnSettings={this.btnSettings.number}>2</Button>
-                <Button btnSettings={this.btnSettings.number}>3</Button>
-                <Button btnSettings={this.btnSettings.operation}>+</Button>
-            </div>
-            <div className="calc">
-            <Button btnSettings={this.btnSettings.addPointBtn}>±</Button>
-                <Button btnSettings={this.btnSettings.number}>0</Button>
-                <Button btnSettings={this.btnSettings.addPointBtn}>,</Button>
-                <Button btnSettings={this.btnSettings.resultBtn}>=</Button>
-            </div>
-            <div className="memory js-memory">
-            </div>
-        </div>
         )
     }
 }
