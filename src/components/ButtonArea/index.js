@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import Button from '../Button';
 import { OPERATIONS } from '../../const';
+import Memory from '../Memory';
 
 export default class ButtonArea extends Component {
     btnSettings = {
@@ -128,9 +129,10 @@ export default class ButtonArea extends Component {
 
     render() {
         const { isDisabled } = this.props;
+        const { styleDisplay } = this.props;
 
         return (
-            <div className="button-area js-button-area">
+            <div style={{'display': styleDisplay}} className="button-area js-button-area">
                 <div className="calc calc-add">
                     <Button btnSettings={this.btnSettings.memoryClearButton}>MC</Button>
                     <Button btnSettings={this.btnSettings.memoryReadButton}>MR</Button>
@@ -175,8 +177,7 @@ export default class ButtonArea extends Component {
                     <Button isDisabled={isDisabled} btnSettings={this.btnSettings.addPointBtn}>,</Button>
                     <Button isDisabled={isDisabled} btnSettings={this.btnSettings.resultBtn}>=</Button>
                 </div>
-                <div className="memory js-memory">
-                </div>
+                <Memory />
             </div>
         )
     }

@@ -12,7 +12,8 @@ export default class Display extends Component {
 
     render() {
         const { value } = this.props;
+        const { styleDisplay } = this.props;
 
-        return <div className="display js-display">{value}</div>;
+        return <div style= {{ 'display': styleDisplay }} className="display js-display">{value}</div>;
     }
 }
