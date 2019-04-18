@@ -1,4 +1,4 @@
-export const MAX_WIDTH_DISPLAY = 286;
+export const MAX_WIDTH_DISPLAY = 280;
 export const MAX_LENGTH_DISPLAY = 10;
 
 export const CALC_MODES = {

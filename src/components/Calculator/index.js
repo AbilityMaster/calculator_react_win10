@@ -46,11 +46,20 @@ export default class Calculator extends Component {
         this.valueForProgressive = null;
         this.typeOperation = '';
         this.currentValue = null;
+
+        this.test = '';
     }
 
     SDclear = () => {
         this.setState({ displayHistoryValue: '' });
         this.values = [];
+        
+        if ((this.historyDisplay.current.$smallDisplay.current.clientWidth) >= MAX_WIDTH_DISPLAY) {
+            this.historyDisplay.current.$buttonMoveLeft.current.style.visibility = 'hidden';
+            this.historyDisplay.current.$buttonMoveRight.current.style.visibility = 'hidden';
+            this.historyDisplay.current.$smallDisplay.current.style.left = '';
+            this.historyDisplay.current.$smallDisplay.current.style.width = '';
+        }
     }
 
     SDclearLastValue = () => {
@@ -150,7 +159,7 @@ export default class Calculator extends Component {
             return;
         }
 
-        this.setState(state => ({ displayValue: this.formatText(`${this.getTextDisplay()}${displayValue}`) }));
+        this.setState(() => ({ displayValue: this.formatText(`${this.getTextDisplay()}${displayValue}`) }));
     }
 
     checkException(operation, result) {
@@ -163,6 +172,7 @@ export default class Calculator extends Component {
                 if (!isFinite(result)) {
                     this.toggleVisualStateButtons();
                     this.display.current.$display.current.style.fontSize = STYLES.SMALL;
+                    this.setState({ isDisabled: true });
                     this.setState({ displayValue: MESSAGES.OVERFLOW });
                     this.operationsDisabled = true;
                 }
@@ -174,6 +184,7 @@ export default class Calculator extends Component {
                     this.operationsDisabled = true;
                     this.toggleVisualStateButtons();
                     this.display.current.$display.current.style.fontSize = STYLES.SMALL;
+                    this.setState({ isDisabled: true });
                     this.setState({ displayValue: MESSAGES.DIVIDE_BY_ZERO });
                 }
 
@@ -184,6 +195,7 @@ export default class Calculator extends Component {
                     this.operationsDisabled = true;
                     this.toggleVisualStateButtons();
                     this.display.current.$display.current.style.fontSize = STYLES.SMALL;
+                    this.setState({ isDisabled: true });
                     this.setState({ displayValue: MESSAGES.DIVIDE_BY_ZERO });
                 }
 
@@ -354,6 +366,33 @@ export default class Calculator extends Component {
         this.setState({ displayHistoryValue: '' })
         for (let i = 0; i < this.values.length; i++) {
             this.setState(state => ({ displayHistoryValue: state.displayHistoryValue + this.values[i] }));
+        }
+    }
+
+    updateWitdhDisplay = (type, isPressedSingleOperation, temp) => {
+        if (type === OPERATIONS.LABEL_SINGLE_OPERATION  && this.typeOperation === undefined) {
+            this.setState({ displayHiddenHistoryvalue:  this.variableForSingleOperationGetWidth });
+        }
+
+        if (type === OPERATIONS.LABEL_DEFAULT_OPERATION && !isPressedSingleOperation) {            
+            this.setState({ displayHiddenHistoryvalue: `${this.values[this.values.length - 2]}${this.values[this.values.length - 1]}` });
+        }
+
+        if (type === OPERATIONS.LABEL_SINGLE_OPERATION  && this.typeOperation !== undefined) {
+           this.setState({ displayHiddenHistoryvalue: this.variableForSingleOperationGetWidth });
+        }
+
+        let width = this.historyDisplay.current.$smallDisplay.current.clientWidth;
+
+        if ((this.values.length === 1) && type !== OPERATIONS.LABEL_SINGLE_OPERATION ) {
+            width = 0;
+        }
+
+        if ((width + this.historyDisplay.current.$hiddenDisplay.current.clientWidth) >= MAX_WIDTH_DISPLAY) {
+            this.historyDisplay.current.$buttonMoveLeft.current.style.visibility = 'visible';
+            this.historyDisplay.current.$buttonMoveRight.current.style.visibility = 'visible';
+            this.historyDisplay.current.$smallDisplay.current.style.left = '';
+            this.historyDisplay.current.$smallDisplay.current.style.width = width + this.historyDisplay.current.$hiddenDisplay.current.clientWidth + 'px';
         }
     }
 
