@@ -6,28 +6,52 @@ import Memory from '../Memory';
 export default class ButtonArea extends Component {
     btnSettings = {
         memoryClearButton: {
-            style: 'calc-add__button calc-add__button_memory-clear js-calc-add__button_memory-clear calc-add__button_disabled',
-            dataAttribute: OPERATIONS.ADDITIONAL.MCLEAR
+            style: 'calc-add__button calc-add__button_memory-clear js-calc-add__button_memory-clear',
+            dataAttribute: OPERATIONS.ADDITIONAL.MCLEAR,
+            memoryClear: () => {
+                const { memoryClear } = this.props;
+                memoryClear();
+            }
         },
         memoryReadButton: {
-            style: 'calc-add__button calc-add__button_read js-calc-add__button_read calc-add__button_disabled',
-            dataAttribute: OPERATIONS.ADDITIONAL.MREAD
+            style: 'calc-add__button calc-add__button_read js-calc-add__button_read',
+            dataAttribute: OPERATIONS.ADDITIONAL.MREAD,
+            memoryRead: () => {
+                const { memoryRead } = this.props;
+                memoryRead();
+            }
         },
         memoryPlusButton: {
             style: 'calc-add__button calc-add__button_plus js-calc-add__button_plus',
-            dataAttribute: OPERATIONS.ADDITIONAL.MPLUS
+            dataAttribute: OPERATIONS.ADDITIONAL.MPLUS,
+            memoryPlus: () => {
+                const { memoryPlus } = this.props;
+                memoryPlus();
+            }
         },
         memoryMinusButton: {
             style: 'calc-add__button calc-add__button_minus js-calc-add__button_minus',
-            dataAttribute: OPERATIONS.ADDITIONAL.MMINUS
+            dataAttribute: OPERATIONS.ADDITIONAL.MMINUS,
+            memoryMinus: () => {
+                const { memoryMinus } = this.props;
+                memoryMinus();
+            }
         },
         memorySaveButton: {
             style: 'calc-add__button calc-add__button_ms js-calc-add__button_ms',
-            dataAttribute: OPERATIONS.ADDITIONAL.MSAVE
+            dataAttribute: OPERATIONS.ADDITIONAL.MSAVE,
+            memorySave: () => {
+                const { memorySave } = this.props;
+                memorySave();
+            }
         },
         memoryOpenButton: {
-            style: 'calc-add__button calc-add__button_memory js-calc-add__button_memory calc-add__button_disabled',
-            dataAttribute: OPERATIONS.ADDITIONAL.MEMORY
+            style: 'calc-add__button calc-add__button_memory js-calc-add__button_memory',
+            dataAttribute: OPERATIONS.ADDITIONAL.MEMORY,
+            memoryOpen: () => {
+                const { memoryOpen } = this.props;
+                memoryOpen();
+            }
         },
         percentBtn: {
             style: 'calc__button calc__button_percent js-calc__button_percent',
@@ -129,17 +153,26 @@ export default class ButtonArea extends Component {
 
     render() {
         const { isDisabled } = this.props;
-        const { styleDisplay } = this.props;
+        const { isDisabledMemoryButtons } = this.props;
+        const { memoryValues } = this.props;
+        const { isVisualMemoryBoard } = this.props;
+        const { isOpenMemoryWindow } = this.props;
+
+        console.log(isDisabledMemoryButtons);
 
         return (
-            <div style={{'display': styleDisplay}} className="button-area js-button-area">
+            <div className="button-area js-button-area">
                 <div className="calc calc-add">
-                    <Button btnSettings={this.btnSettings.memoryClearButton}>MC</Button>
-                    <Button btnSettings={this.btnSettings.memoryReadButton}>MR</Button>
-                    <Button btnSettings={this.btnSettings.memoryPlusButton}>M<span>+</span></Button>
-                    <Button btnSettings={this.btnSettings.memoryMinusButton}>M<span>-</span></Button>
-                    <Button btnSettings={this.btnSettings.memorySaveButton}>MS</Button>
-                    <Button btnSettings={this.btnSettings.memoryOpenButton}>M</Button>
+                    <Button
+                        isOpenMemoryWindow={isOpenMemoryWindow}
+                        isDisabledMemoryButtons={isDisabledMemoryButtons}
+                        btnSettings={this.btnSettings.memoryClearButton}
+                    >MC</Button>
+                    <Button isOpenMemoryWindow={isOpenMemoryWindow} isDisabledMemoryButtons={isDisabledMemoryButtons} btnSettings={this.btnSettings.memoryReadButton}>MR</Button>
+                    <Button isOpenMemoryWindow={isOpenMemoryWindow} btnSettings={this.btnSettings.memoryPlusButton}>M<span>+</span></Button>
+                    <Button isOpenMemoryWindow={isOpenMemoryWindow} btnSettings={this.btnSettings.memoryMinusButton}>M<span>-</span></Button>
+                    <Button isOpenMemoryWindow={isOpenMemoryWindow} btnSettings={this.btnSettings.memorySaveButton}>MS</Button>
+                    <Button isDisabledMemoryButtons={isDisabledMemoryButtons} btnSettings={this.btnSettings.memoryOpenButton}>M</Button>
                 </div>
                 <div className="calc">
                     <Button isDisabled={isDisabled} btnSettings={this.btnSettings.percentBtn}>%</Button>
@@ -177,7 +210,7 @@ export default class ButtonArea extends Component {
                     <Button isDisabled={isDisabled} btnSettings={this.btnSettings.addPointBtn}>,</Button>
                     <Button isDisabled={isDisabled} btnSettings={this.btnSettings.resultBtn}>=</Button>
                 </div>
-                <Memory />
+                <Memory isVisualMemoryBoard={isVisualMemoryBoard} memoryValues={memoryValues} />
             </div>
         )
     }

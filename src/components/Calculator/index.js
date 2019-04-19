@@ -7,6 +7,7 @@ import ButtonArea from '../ButtonArea';
 import LocalStorage from '../localStorage';
 import projectInfo from '../../../package.json';
 import Memory from '../Memory';
+import nanoid from 'nanoid';
 
 export default class Calculator extends Component {
     constructor() {
@@ -15,7 +16,17 @@ export default class Calculator extends Component {
         this.VERSION = projectInfo.version;
         this.localStorage = new LocalStorage(this.VERSION, this.NAME);
         this.memory = new Memory();
-        this.state = { displayValue: '0', isDisabled: false, displayHistoryValue: '', displayHiddenHistoryvalue: '', mode: CALC_MODES.DEFAULT };
+        this.state = {
+            displayValue: '0',
+            isDisabled: false,
+            displayHistoryValue: '',
+            displayHiddenHistoryvalue: '',
+            mode: CALC_MODES.DEFAULT,
+            isOpenMemoryWindow: false,
+            isDisabledMemoryButtons: true,
+            memoryValues: [],
+            isVisualMemoryBoard: false
+        };
         this.maxLength = MAX_LENGTH_DISPLAY;
         this.values = [];
         this.smallDisplay = React.createRef();
@@ -24,6 +35,11 @@ export default class Calculator extends Component {
         this.$calculator = React.createRef();
         this.stateSettings = {};
         this.styleSettings = {};
+        this.memoryValues = {};
+        this.positionAttribute = 0;
+        this.currentValue = null;
+        this.memoryArrayOfValues = [];
+        this.$calculatorBody = React.createRef();
     }
 
     clear = () => {
@@ -53,7 +69,7 @@ export default class Calculator extends Component {
     SDclear = () => {
         this.setState({ displayHistoryValue: '' });
         this.values = [];
-        
+
         if ((this.historyDisplay.current.$smallDisplay.current.clientWidth) >= MAX_WIDTH_DISPLAY) {
             this.historyDisplay.current.$buttonMoveLeft.current.style.visibility = 'hidden';
             this.historyDisplay.current.$buttonMoveRight.current.style.visibility = 'hidden';
@@ -118,8 +134,9 @@ export default class Calculator extends Component {
     }
 
     getTextDisplay = () => {
-        let data = this.formatText(this.state.displayValue);
+        let data = this.formatText(String(this.state.displayValue));
 
+        // eslint-disable-next-line
         data = data.replace(/\&nbsp\;/g, "\xa0");
         data = data.replace(/\s+/g, '');
         data = data.replace(',', '.');
@@ -213,7 +230,7 @@ export default class Calculator extends Component {
                 break;
             }
             default: {
-                console.log(MESSAGES.EXCEPTIONS);
+                console.log(MESSAGES.ERRROR.EXCEPTIONS);
                 break;
             }
         }
@@ -316,13 +333,13 @@ export default class Calculator extends Component {
 
         if (this.isNeedValueForProgressive) {
             this.valueForProgressive = parseFloat(this.getTextDisplay());
-            
             this.isNeedValueForProgressive = false;
         }
 
         if (this.isResultPressed && this.currentValue !== null) {
             let result = this.sendOperation(this.typeOperation, this.currentValue, this.valueForProgressive);
             this.sendResult(this.typeOperation, result);
+
         }
     }
 
@@ -370,21 +387,21 @@ export default class Calculator extends Component {
     }
 
     updateWitdhDisplay = (type, isPressedSingleOperation, temp) => {
-        if (type === OPERATIONS.LABEL_SINGLE_OPERATION  && this.typeOperation === undefined) {
-            this.setState({ displayHiddenHistoryvalue:  this.variableForSingleOperationGetWidth });
+        if (type === OPERATIONS.LABEL_SINGLE_OPERATION && this.typeOperation === undefined) {
+            this.setState({ displayHiddenHistoryvalue: this.variableForSingleOperationGetWidth });
         }
 
-        if (type === OPERATIONS.LABEL_DEFAULT_OPERATION && !isPressedSingleOperation) {            
+        if (type === OPERATIONS.LABEL_DEFAULT_OPERATION && !isPressedSingleOperation) {
             this.setState({ displayHiddenHistoryvalue: `${this.values[this.values.length - 2]}${this.values[this.values.length - 1]}` });
         }
 
-        if (type === OPERATIONS.LABEL_SINGLE_OPERATION  && this.typeOperation !== undefined) {
-           this.setState({ displayHiddenHistoryvalue: this.variableForSingleOperationGetWidth });
+        if (type === OPERATIONS.LABEL_SINGLE_OPERATION && this.typeOperation !== undefined) {
+            this.setState({ displayHiddenHistoryvalue: this.variableForSingleOperationGetWidth });
         }
 
         let width = this.historyDisplay.current.$smallDisplay.current.clientWidth;
 
-        if ((this.values.length === 1) && type !== OPERATIONS.LABEL_SINGLE_OPERATION ) {
+        if ((this.values.length === 1) && type !== OPERATIONS.LABEL_SINGLE_OPERATION) {
             width = 0;
         }
 
@@ -500,11 +517,12 @@ export default class Calculator extends Component {
         this.$calculator.current.style.right = 'auto';
         document.body.appendChild(this.$calculator.current);
         //this.tagForInsert.innerHTML = '';
-        let shiftX = e.pageX -   this.$calculator.current.offsetLeft;
-        let shiftY = e.pageY -   this.$calculator.current.offsetTop;
+        let shiftX = e.pageX - this.$calculator.current.offsetLeft;
+        let shiftY = e.pageY - this.$calculator.current.offsetTop;
         moveAt(e);
-          this.$calculator.current.style.zIndex = 1000;
+        this.$calculator.current.style.zIndex = 1000;
 
+        //addeve  
         document.onmousemove = function (e) {
             if (window.innerWidth < 350) {
                 return false;
@@ -512,9 +530,9 @@ export default class Calculator extends Component {
             moveAt(e);
         };
 
-          this.$calculator.current.onmouseup = () => {
+        this.$calculator.current.onmouseup = () => {
             document.onmousemove = null;
-              this.$calculator.current.onmouseup = null;
+            this.$calculator.current.onmouseup = null;
         };
     };
 
@@ -624,58 +642,21 @@ export default class Calculator extends Component {
 
     toggleVisualStateButtons = () => {
         this.setState({ isDisabled: false });
+        this.stateSettings.isDisabledMemoryButtons = false;
     }
 
-    loadPosition() {
-        this.defaultSettings = {
-            mode: CALC_MODES.DEFAULT,
-            x: `${(window.innerWidth - 320) / window.innerWidth * 100}%`,
-            y: `${(window.innerHeight - 540) / window.innerHeight * 100}%`
-        };
 
-        let storage = this.localStorage.dataset;
-
-        if (!storage) {
-            // this.stateSettings = this.stateSettings;
-            this.localStorage.dataset = this.defaultSettings;
-        }
-
-        for (let key in storage.memoryValues) {
-            if (!storage.memoryValues.hasOwnProperty(key)) {
-                continue;
-            }
-
-            //this.memory.addToMemory(storage.memoryValues[key]);
-        }
-
-        /*      if (storage.isActivatedMemoryButtons) {
-                  this.memory.setVisual();
-              } else {
-                  this.memory.setDisabled();
-              }
-      
-      */
-        this.stateSettings.x = storage.x ? storage.x : this.defaultSettings.x;
-        this.stateSettings.y = storage.y ? storage.y : this.defaultSettings.y;
-        this.manage(storage.mode);
-    }
 
     manage = (mode) => {
         switch (mode) {
             case CALC_MODES.STANDART: {
-                this.styleSettings.optionMenu = 'flex';
-                this.styleSettings.groupSmallDisplay = 'flex';
-                this.styleSettings.display = 'block';
-                this.styleSettings.buttonArea = 'block';
+                this.styleSettings.visible = 'block';
                 this.styleSettings.calculatorHeight = '540px';
 
                 break;
             }
             case CALC_MODES.MINIMIZED: {
-                this.styleSettings.optionMenu = 'none';
-                this.styleSettings.groupSmallDisplay = 'none';
-                this.styleSettings.display = 'none';
-                this.styleSettings.buttonArea = 'none';
+                this.styleSettings.visible = 'none';
                 this.styleSettings.calculatorHeight = '32px';
                 this.styleSettings.calculatorBottom = 'auto';
 
@@ -689,10 +670,7 @@ export default class Calculator extends Component {
             }
             case CALC_MODES.DEFAULT: {
                 this.styleSettings.openCalcDisplay = 'none';
-                this.styleSettings.optionMenu = 'flex';
-                this.styleSettings.groupSmallDisplay = 'flex';
-                this.styleSettings.display = 'block';
-                this.styleSettings.buttonArea = 'block';
+                this.styleSettings.visible = 'block';
                 this.styleSettings.calculatorHeight = '540px';
                 this.styleSettings.calculatorDisplay = 'block'
                 this.stateSettings.x = this.defaultSettings.x;
@@ -737,7 +715,7 @@ export default class Calculator extends Component {
     };
 
     memoryPlus() {
-        if (this.isOpenMemoryWindow || !isFinite(parseFloat(this.calc.getDisplayData()))) {
+        if (this.state.isOpenMemoryWindow || !isFinite(parseFloat(this.calc.getDisplayData()))) {
             return;
         }
 
@@ -767,23 +745,142 @@ export default class Calculator extends Component {
         this.calc.updateLSData(this.storageMemoryData);
     }
 
+    memorySave = () => {
+        if (this.state.isOpenMemoryWindow || !isFinite(parseFloat(this.getTextDisplay()))) {
+            return;
+        }
+
+        this.isDisabledMemoryButtons = false;
+        this.setState({ isDisabledMemoryButtons: false });
+
+        this.stateSettings.isDisabledMemoryButtons = this.isDisabledMemoryButtons;
+        this.localStorage.dataset = this.stateSettings;
+
+        this.addToMemory(this.getTextDisplay());
+
+
+        this.stateSettings.memoryValues = this.memoryArrayOfValues;
+        this.localStorage.dataset = this.stateSettings;
+    };
+
+    loadStateFromLocalStorage() {
+        this.defaultSettings = {
+            mode: CALC_MODES.DEFAULT,
+            x: `${(window.innerWidth - 320) / window.innerWidth * 100}%`,
+            y: `${(window.innerHeight - 540) / window.innerHeight * 100}%`,
+            isDisabledMemoryButtons: true,
+            memoryValues: []
+        };
+
+        let storage = this.localStorage.dataset;
+
+        if (!storage) {
+            this.localStorage.dataset = this.defaultSettings;
+        }
+
+        storage = this.localStorage.dataset;
+
+        this.stateSettings.memoryValues = storage.memoryValues;
+
+
+        for (let key in storage.memoryValues) {
+            if (!storage.memoryValues.hasOwnProperty(key)) {
+                continue;
+            }
+
+            //  this.addToMemory(storage.memoryValues[key].data);
+        }
+
+        if (storage.isDisabledMemoryButtons) {           
+           this.stateSettings.isDisabledMemoryButtons = true;
+        } else {
+            this.stateSettings.isDisabledMemoryButtons = false;  
+        }
+
+        this.stateSettings.x = storage.x ? storage.x : this.defaultSettings.x;
+        this.stateSettings.y = storage.y ? storage.y : this.defaultSettings.y;
+        this.manage(storage.mode);
+    }
+
+    addToMemory = (data) => {
+        console.log(this.positionAttribute);
+        let tempObj = {
+            id: nanoid(7),
+            data: data,
+            position: this.positionAttribute
+        }
+
+        this.memoryArrayOfValues.push(tempObj);
+        this.positionAttribute++;
+
+        this.setState({ memoryValues: this.memoryArrayOfValues });
+    }
+
+    memoryOpen = () => {
+        if (this.state.isDisabledMemoryButtons) {
+            return;
+        }
+
+        if (!this.state.isVisualMemoryBoard) {
+            this.setState({ isVisualMemoryBoard: true, isOpenMemoryWindow: true });
+        } else {
+            this.setState({ isVisualMemoryBoard: false, isOpenMemoryWindow: false });
+        }
+    }
+
+    memoryClear = () => {
+        if (this.state.isOpenMemoryWindow || this.stateSettings.isDisabledMemoryButtons) {
+            return;
+        }
+
+        
+        this.stateSettings.isDisabledMemoryButtons = true;
+        this.stateSettings.memoryValues = [];
+        this.localStorage.dataset = this.stateSettings;
+        this.setState({ isDisabledMemoryButtons: this.stateSettings.isDisabledMemoryButtons, memoryValues: this.memoryArrayOfValues});
+        
+
+    }
+
+    memoryRead = () => {
+        if (this.stateSettings.isDisabledMemoryButtons || this.state.isOpenMemoryWindow) {
+			return;
+		}
+
+        let position = this.stateSettings.memoryValues[this.stateSettings.memoryValues.length - 1].position;
+        this.setState({ displayValue: this.stateSettings.memoryValues[position].data});
+        this.isEnteredNewValue = true;
+
+		//let position = document.querySelector('.memory__block').dataset.position;
+
+		//this.calc.updateDisplay(this.memoryValues[position]);
+		//this.calc.updateIsEnteredNewValue();
+    }
+
+    memoryMinus = () => {
+        if (this.state.isOpenMemoryWindow) {
+            return;
+        }
+    }
+
     render() {
         const { displayValue } = this.state;
         const { isDisabled } = this.state;
         const { displayHistoryValue } = this.state;
         const { displayHiddenHistoryvalue } = this.state;
+        const { isDisabledMemoryButtons } = this.state;
 
-        this.loadPosition();
+        this.loadStateFromLocalStorage();
 
         return (
             <React.Fragment>
                 <div onClick={this.buttonOpenCalculator} style={{ 'display': this.styleSettings.openCalcDisplay }} className="open-calculator js-open-calculator">Open calc</div>
                 <div ref={this.$calculator} onDragStart={this.calculatorDragStart} className="calculator js-calculator" style={{
-                    'left': this.stateSettings.x,
-                    'top': this.stateSettings.y,
-                    'height': this.styleSettings.calculatorHeight,
-                    'bottom': this.styleSettings.calculatorBottom,
-                    'display': this.styleSettings.calculatorDisplay
+                    left: this.stateSettings.x,
+                    top: this.stateSettings.y,
+                    height: this.styleSettings.calculatorHeight,
+                    bottom: this.styleSettings.calculatorBottom,
+                    display: this.styleSettings.calculatorDisplay
                 }}>
                     <div className="index-menu">
                         <p onMouseDown={this.calculatorDragAndDrop} className="index-menu__title js-index-menu__title">Калькулятор</p>
@@ -791,26 +888,44 @@ export default class Calculator extends Component {
                         <div onClick={this.buttonOpen} className="index-menu__button index-menu__button_open js-index-menu__button_open">☐</div>
                         <div onClick={this.buttonClose} className="index-menu__button index-menu__button_close js-index-menu__button_close">✕</div>
                     </div>
-                    <div style={{ 'display': this.styleSettings.optionMenu }} className="option-menu js-option-menu">
-                        <div className="option-menu__btn-menu">☰</div>
-                        <p className="option-menu__title">Обычный</p>
-                        <div className="option-menu__btn-journal"></div>
+                    <div ref={this.$calculatorBody} style={{ display: this.styleSettings.visible }} className="calculator-body">
+                        <div className="option-menu js-option-menu">
+                            <div className="option-menu__btn-menu">☰</div>
+                            <p className="option-menu__title">Обычный</p>
+                            <div className="option-menu__btn-journal"></div>
+                        </div>
+                        <HistoryDisplay
+                            ref={this.historyDisplay}
+                            value={displayHistoryValue}
+                            displayHiddenHistoryvalue={displayHiddenHistoryvalue}
+                        />
+                        <Display
+                            ref={this.display}
+                            value={displayValue}
+                        />
+                        <ButtonArea
+                            isOpenMemoryWindow={this.state.isOpenMemoryWindow}
+                            isVisualMemoryBoard={this.state.isVisualMemoryBoard}
+                            memoryValues={this.state.memoryValues}
+                            updateDisplayValue={this.handleChangeValue}
+                            operation={this.operation}
+                            result={this.result}
+                            clear={this.clear}
+                            addPoint={this.addPoint}
+                            backspace={this.backspace}
+                            reverse={this.reverse}
+                            percent={this.percent}
+                            singleOperation={this.singleOperation}
+                            isDisabled={isDisabled}
+                            isDisabledMemoryButtons={this.stateSettings.isDisabledMemoryButtons}
+                            memoryClear={this.memoryClear}
+                            memoryRead={this.memoryRead}
+                            memoryPlus={this.memoryPlus}
+                            memoryMinus={this.memoryMinus}
+                            memorySave={this.memorySave}
+                            memoryOpen={this.memoryOpen}
+                        />
                     </div>
-                    <HistoryDisplay ref={this.historyDisplay} styleSettings={this.styleSettings.groupSmallDisplay} value={displayHistoryValue} displayHiddenHistoryvalue={displayHiddenHistoryvalue} />
-                    <Display ref={this.display} styleDisplay={this.styleSettings.display} value={displayValue} />
-                    <ButtonArea ref={this.buttonArea} styleDisplay={this.styleSettings.buttonArea}
-                        updateDisplayValue={this.handleChangeValue}
-                        operation={this.operation}
-                        result={this.result}
-                        clear={this.clear}
-                        addPoint={this.addPoint}
-                        backspace={this.backspace}
-                        reverse={this.reverse}
-                        percent={this.percent}
-                        singleOperation={this.singleOperation}
-                        isDisabled={isDisabled}
-                        memoryPlus={this.memoryPlus}
-                    />
                 </div>
             </React.Fragment>
         )

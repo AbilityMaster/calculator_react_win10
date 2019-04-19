@@ -13,6 +13,12 @@ export default class Button extends Component {
         const { reverse } = this.props.btnSettings;
         const { percent } = this.props.btnSettings;
         const { singleOperation } = this.props.btnSettings;
+        const { memoryClear } = this.props.btnSettings;
+        const { memoryRead } = this.props.btnSettings;
+        const { memoryPlus } = this.props.btnSettings;
+        const { memoryMinus } = this.props.btnSettings;
+        const { memorySave } = this.props.btnSettings;
+        const { memoryOpen } = this.props.btnSettings;
 
         switch (event.target.dataset.type) {
             case 'number': {
@@ -59,6 +65,30 @@ export default class Button extends Component {
                 singleOperation(OPERATIONS.FRAC);
                 break;
             }
+            case OPERATIONS.ADDITIONAL.MCLEAR: {
+                memoryClear();
+                break;
+            }
+            case OPERATIONS.ADDITIONAL.MREAD: {
+                memoryRead();
+                break;
+            }
+            case OPERATIONS.ADDITIONAL.MPLUS: {
+                memoryPlus();
+                break;
+            }
+            case OPERATIONS.ADDITIONAL.MMINUS: {
+                memoryMinus();
+                break;
+            }
+            case OPERATIONS.ADDITIONAL.MSAVE: {
+                memorySave();
+                break;
+            }
+            case OPERATIONS.ADDITIONAL.MEMORY: {
+                memoryOpen();
+                break;
+            }
             default: {
                 console.log('Error in events');
 
@@ -71,8 +101,21 @@ export default class Button extends Component {
         let { style } = this.props.btnSettings;
         let { dataAttribute } = this.props.btnSettings;
         const { isDisabled } = this.props;
+        const { isDisabledMemoryButtons } = this.props;
+        const { isOpenMemoryWindow } = this.props; 
 
-        if (isDisabled === true) {
+        console.log(isDisabledMemoryButtons);
+
+        if (isDisabledMemoryButtons) {
+            console.log('+');
+            style += ' calc-add__button_disabled';
+        }
+        
+        if (isDisabled) {
+            style += ' calc__button_disabled';
+        }
+        
+        if (isOpenMemoryWindow) {
             style += ' calc__button_disabled';
         }
 

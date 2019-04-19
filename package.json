@@ -23,6 +23,7 @@
     "not op_mini all"
   ],
   "devDependencies": {
+    "nanoid": "^2.0.1",
     "node-sass": "^4.11.0",
     "prop-types": "^15.7.2"
   }
