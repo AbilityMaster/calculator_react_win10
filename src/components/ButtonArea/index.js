@@ -158,8 +158,7 @@ export default class ButtonArea extends Component {
         const { isVisualMemoryBoard } = this.props;
         const { isOpenMemoryWindow } = this.props;
 
-        console.log(isDisabledMemoryButtons);
-
+        console.log(memoryValues);
         return (
             <div className="button-area js-button-area">
                 <div className="calc calc-add">

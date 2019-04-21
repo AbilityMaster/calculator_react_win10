@@ -745,30 +745,17 @@ export default class Calculator extends Component {
         this.calc.updateLSData(this.storageMemoryData);
     }
 
-    memorySave = () => {
-        if (this.state.isOpenMemoryWindow || !isFinite(parseFloat(this.getTextDisplay()))) {
-            return;
-        }
-
-        this.isDisabledMemoryButtons = false;
-        this.setState({ isDisabledMemoryButtons: false });
-
-        this.stateSettings.isDisabledMemoryButtons = this.isDisabledMemoryButtons;
-        this.localStorage.dataset = this.stateSettings;
-
-        this.addToMemory(this.getTextDisplay());
-
-
-        this.stateSettings.memoryValues = this.memoryArrayOfValues;
-        this.localStorage.dataset = this.stateSettings;
-    };
+  
 
     loadStateFromLocalStorage() {
+
+
         this.defaultSettings = {
             mode: CALC_MODES.DEFAULT,
             x: `${(window.innerWidth - 320) / window.innerWidth * 100}%`,
             y: `${(window.innerHeight - 540) / window.innerHeight * 100}%`,
             isDisabledMemoryButtons: true,
+            positionAttribute: 0,
             memoryValues: []
         };
 
@@ -779,17 +766,19 @@ export default class Calculator extends Component {
         }
 
         storage = this.localStorage.dataset;
-
-        this.stateSettings.memoryValues = storage.memoryValues;
-
+       
+            this.stateSettings = storage;
 
         for (let key in storage.memoryValues) {
             if (!storage.memoryValues.hasOwnProperty(key)) {
                 continue;
             }
 
-            //  this.addToMemory(storage.memoryValues[key].data);
+         //  console.log(storage.memoryValues);
+         //  this.addToMemory(storage.memoryValues[key].data);
         }
+
+        this.memoryArrayOfValues = this.stateSettings.memoryValues;
 
         if (storage.isDisabledMemoryButtons) {           
            this.stateSettings.isDisabledMemoryButtons = true;
@@ -803,23 +792,54 @@ export default class Calculator extends Component {
     }
 
     addToMemory = (data) => {
-        console.log(this.positionAttribute);
+
         let tempObj = {
             id: nanoid(7),
             data: data,
             position: this.positionAttribute
+         // position: this.memoryArrayOfValues.length === 0 ? 0 : this.memoryArrayOfValues.length - 1
         }
 
-        this.memoryArrayOfValues.push(tempObj);
-        this.positionAttribute++;
+        
+        console.log( this.memoryArrayOfValues);
+       // this.memoryArrayOfValues = this.stateSettings.memoryValues;
 
-        this.setState({ memoryValues: this.memoryArrayOfValues });
+
+
+        this.memoryArrayOfValues.unshift(tempObj);
+        this.positionAttribute++;
+        this.stateSettings.positionAttribute = this.positionAttribute;
+        this.stateSettings.memoryValues = this.memoryArrayOfValues;
+
+
     }
 
-    memoryOpen = () => {
-        if (this.state.isDisabledMemoryButtons) {
+    memorySave = () => {
+        if (this.state.isOpenMemoryWindow || !isFinite(parseFloat(this.getTextDisplay()))) {
             return;
         }
+
+        if (this.isDisabledMemoryButtons) {
+            console.log('+++++');
+            this.setState({isDisabledMemoryButtons: false});
+        }
+
+        this.isDisabledMemoryButtons = false;
+        this.stateSettings.isDisabledMemoryButtons = this.isDisabledMemoryButtons;
+
+        this.positionAttribute = this.stateSettings.positionAttribute;
+        this.addToMemory(this.getTextDisplay());
+
+        this.localStorage.dataset = this.stateSettings;
+
+    };
+
+    memoryOpen = () => {
+        if (this.stateSettings.isDisabledMemoryButtons) {
+            return;
+        }
+
+        console.log('+');
 
         if (!this.state.isVisualMemoryBoard) {
             this.setState({ isVisualMemoryBoard: true, isOpenMemoryWindow: true });
@@ -906,7 +926,7 @@ export default class Calculator extends Component {
                         <ButtonArea
                             isOpenMemoryWindow={this.state.isOpenMemoryWindow}
                             isVisualMemoryBoard={this.state.isVisualMemoryBoard}
-                            memoryValues={this.state.memoryValues}
+                            memoryValues={this.stateSettings.memoryValues}
                             updateDisplayValue={this.handleChangeValue}
                             operation={this.operation}
                             result={this.result}

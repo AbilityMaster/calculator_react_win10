@@ -197,15 +197,16 @@ body, html {
 		line-height: 30px;
 		text-align: center;
 		margin: 1px;
-		cursor: pointer;
-		&:hover {
+		&:hover {			
+			cursor: pointer;
 			background: #dbdbdb;
 			outline: 1px solid #bcbbbb;
 		}
 		&_disabled {
 			opacity: 0.2;
-			cursor: default;
 			&:hover {
+				
+			cursor: default;
 				background: none;				
 				outline: none;
 			}
