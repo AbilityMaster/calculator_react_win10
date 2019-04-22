@@ -1,7 +1,18 @@
 import React, { Component } from 'react';
 import { MAX_WIDTH_DISPLAY } from '../../const';
+import PropTypes from 'prop-types';
 
 export default class HistoryDisplay extends Component {
+    static propTypes = {
+        value: PropTypes.string,
+        displayHiddenHistoryvalue: PropTypes.string
+    }
+
+    static defaultProps = {
+        value: '',
+        displayHiddenHistoryvalue: ''
+    }
+    
     constructor() {
         super();
         this.$smallDisplay = React.createRef();

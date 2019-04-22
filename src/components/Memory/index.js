@@ -1,11 +1,15 @@
 import React, { Component } from 'react';
 import MemoryBlock from '../MemoryBlock';
-
+import PropTypes from 'prop-types';
 
 export default class Memory extends Component {
-
-
-
+    static propTypes = {
+        clearItemFromMemoryBoard: PropTypes.func,
+        updateLocalStorage: PropTypes.func,
+        displayValue: PropTypes.string,
+        isOpenMemoryWindow: PropTypes.bool,
+        memoryValues: PropTypes.array
+    }
 
     render() {
         const { memoryValues } = this.props;
@@ -13,11 +17,17 @@ export default class Memory extends Component {
         const { displayValue } = this.props;
         const { updateLocalStorage } = this.props;
         const { clearItemFromMemoryBoard } = this.props;
-        
+
         let classProperties = "memory js-memory";
 
-       const memoryElements = memoryValues.map((memory) =>
-            <MemoryBlock clearItemFromMemoryBoard={clearItemFromMemoryBoard} updateLocalStorage={updateLocalStorage} displayValue={displayValue} key={memory.id} memory={memory} />
+        const memoryElements = memoryValues.map((memory) =>
+            <MemoryBlock
+                clearItemFromMemoryBoard={clearItemFromMemoryBoard}
+                updateLocalStorage={updateLocalStorage}
+                displayValue={displayValue}
+                key={memory.id}
+                memory={memory}
+            />
         );
 
         if (isOpenMemoryWindow) {
@@ -25,10 +35,10 @@ export default class Memory extends Component {
         } else {
             classProperties = "memory js-memory";
         }
-        
+
         return (
             <div className={classProperties}>
-              {memoryElements}
+                {memoryElements}
             </div>
         )
     }

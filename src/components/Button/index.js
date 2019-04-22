@@ -6,36 +6,36 @@ export default class Button extends Component {
     switcherEvents = (event) => {
         const { updateDisplayValue } = this.props.btnSettings;
         const { operation } = this.props.btnSettings;
-        const { result } = this.props.btnSettings;
-        const { clear } = this.props.btnSettings;
-        const { addPoint } = this.props.btnSettings;
-        const { backspace } = this.props.btnSettings;
-        const { reverse } = this.props.btnSettings;
-        const { percent } = this.props.btnSettings;
+        const { result } = this.props;
+        const { clear } = this.props;
+        const { addPoint } = this.props;
+        const { backspace } = this.props;
+        const { reverse } = this.props;
+        const { percent } = this.props;
         const { singleOperation } = this.props.btnSettings;
-        const { memoryClear } = this.props.btnSettings;
-        const { memoryRead } = this.props.btnSettings;
-        const { memoryPlus } = this.props.btnSettings;
-        const { memoryMinus } = this.props.btnSettings;
-        const { memorySave } = this.props.btnSettings;
-        const { memoryOpen } = this.props.btnSettings;
+        const { memoryClear } = this.props;
+        const { memoryRead } = this.props;
+        const { memoryPlus } = this.props;
+        const { memoryMinus } = this.props;
+        const { memorySave } = this.props;
+        const { memoryOpen } = this.props;
 
         switch (event.target.dataset.type) {
-            case 'number': {
+            case OPERATIONS.ADDITIONAL.NUMBER: {
                 updateDisplayValue(event.target.innerHTML);
 
                 break;
             }
-            case 'operation': {
+            case OPERATIONS.ADDITIONAL.OPERATION: {
                 operation(event.target.innerHTML);
 
                 break;
             }
-            case 'result': {
+            case OPERATIONS.ADDITIONAL.RESULT: {
                 result();
                 break;
             }
-            case 'clear': {
+            case OPERATIONS.ADDITIONAL.CLEAR: {
                 clear();
                 break;
             }
@@ -103,8 +103,6 @@ export default class Button extends Component {
         const { isDisabled } = this.props;
         const { isDisabledMemoryButtons } = this.props;
         const { isOpenMemoryWindow } = this.props; 
-
-      // console.log(isDisabledMemoryButtons);
 
         if (isDisabledMemoryButtons) {
             style += ' calc-add__button_disabled';

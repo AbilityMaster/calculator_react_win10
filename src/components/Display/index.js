@@ -3,8 +3,7 @@ import PropTypes from 'prop-types';
 
 export default class Display extends Component {
     static propTypes = {
-        value: PropTypes.string,
-        styleDisplay: PropTypes.string
+        value: PropTypes.string
     };
 
     static defaultProps = {

@@ -1,6 +1,14 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 
 export default class MemoryBlock extends Component {
+    static propTypes = {
+        clearItemFromMemoryBoard: PropTypes.func,
+        updateLocalStorage: PropTypes.func,
+        displayValue: PropTypes.string,
+        memory: PropTypes.object
+    }
+
     constructor() {
         super();
         this.$btnMemoryClear = React.createRef();

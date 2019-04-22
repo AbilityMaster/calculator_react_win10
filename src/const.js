@@ -38,18 +38,15 @@ export const OPERATIONS = {
 	PERCENT: 'PERCENT',
 	LABEL_SINGLE_OPERATION: 'single',
 	LABEL_DEFAULT_OPERATION: 'default',
-	NAME_OF_DATASET_ATTRIBUTE: {
-		VALUE: 'value',
-		OPERATION: 'operation',
-		ADDITIONAL: 'add'
-	},
 	ADDITIONAL: {
+		NUMBER: 'number',
+		OPERATION: 'operation',
+		CLEAR: 'clear',
 		PLUS_MINUS: '±',
 		PERCENT: '%',
 		SQRT: '√',
 		POW: 'POW',
 		FRAC: 'frac',
-		CLEAR: 'clear',
 		BACKSPACE: 'back',
 		REVERSE: 'reverse',
 		POINT: 'point',
@@ -62,7 +59,6 @@ export const OPERATIONS = {
 		MEMORY: 'memory'
 	}
 };
-
 
 export const NAME_FOR_DISPLAY = {
 	[OPERATIONS.POW]: 'sqr',

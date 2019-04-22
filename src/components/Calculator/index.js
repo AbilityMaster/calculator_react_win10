@@ -3,7 +3,7 @@ import '../../scss/st.scss';
 import { OPERATIONS, MESSAGES, STYLES, MAX_WIDTH_DISPLAY, CALC_MODES, MAX_LENGTH_DISPLAY, NAME_FOR_DISPLAY } from '../../const';
 import HistoryDisplay from '../HistoryDisplay';
 import Display from '../Display';
-import ButtonArea from '../ButtonArea';
+import Button from '../Button';
 import LocalStorage from '../localStorage';
 import projectInfo from '../../../package.json';
 import Memory from '../Memory';
@@ -256,7 +256,7 @@ export default class Calculator extends Component {
 
         if (!this.operationsDisabled) {
             this.setState({
-                displayValue: this.formatText(this.trimmer(result))
+                displayValue: String(this.formatText(this.trimmer(result)))
             });
         }
 
@@ -352,10 +352,10 @@ export default class Calculator extends Component {
         if (this.isOperationPressed) {
             if (this.isEnteredNewValue) {
                 if (this.isResultPressed) {
-                   this.currentValue = this.sendOperation(this.typeOperation, this.currentValue, this.valueForProgressive);
+                    this.currentValue = this.sendOperation(this.typeOperation, this.currentValue, this.valueForProgressive);
                     this.sendResult(operation, this.currentValue);
                 } else {
-                   this.currentValue = this.sendOperation(this.typeOperation, this.currentValue, parseFloat(this.getTextDisplay()));
+                    this.currentValue = this.sendOperation(this.typeOperation, this.currentValue, parseFloat(this.getTextDisplay()));
                     this.sendResult(operation, this.currentValue);
                 }
             }
@@ -366,7 +366,7 @@ export default class Calculator extends Component {
             return;
         }
 
-       this.currentValue = parseFloat(this.getTextDisplay());
+        this.currentValue = parseFloat(this.getTextDisplay());
         this.typeOperation = operation;
         this.isOperationPressed = true;
         this.isEnteredNewValue = false;
@@ -376,7 +376,7 @@ export default class Calculator extends Component {
         if (this.operationsDisabled || (operation === OPERATIONS.PERCENT && this.currentValue === null)) {
             return;
         }
-        
+
         this.isNeedNewValueInDisplay = true;
         // eslint-disable-next-line
         this.sendToSmallDisplay(OPERATIONS.LABEL_SINGLE_OPERATION, operation, result, this.isPressedSingleOperation);
@@ -487,7 +487,7 @@ export default class Calculator extends Component {
             this.historyDisplay.current.$smallDisplay.current.style.width = width + this.historyDisplay.current.$hiddenDisplay.current.clientWidth + 'px';
         }
     }
-   
+
     calculatorDragAndDrop = (e) => {
         let moveAt = (e) => {
             if ((e.pageX - shiftX + this.$calculator.current.clientWidth) > window.innerWidth) {
@@ -617,7 +617,7 @@ export default class Calculator extends Component {
             this.isNeedNewValueInDisplay = true;
             this.sendToSmallDisplay(OPERATIONS.LABEL_SINGLE_OPERATION, OPERATIONS.NEGATE, this.valueForProgressive, this.isPressedSingleOperation);
         }
-        
+
         this.isPressedSingleOperation = true;
 
         if (this.getTextDisplay() === '0') {
@@ -790,7 +790,7 @@ export default class Calculator extends Component {
         }
 
         this.isOpenMemoryWindow = true;
-        
+
         if (!this.state.isOpenMemoryWindow) {
             this.setState({ isOpenMemoryWindow: true });
         } else {
@@ -888,11 +888,97 @@ export default class Calculator extends Component {
         }
 
         this.localStorage.dataset = this.stateSettings;
-        this.setState({ memoryValues: this.stateSettings.memoryValues});
+        this.setState({ memoryValues: this.stateSettings.memoryValues });
+    }
+
+    btnSettings = {
+        memoryClearButton: {
+            style: 'calc-add__button calc-add__button_memory-clear js-calc-add__button_memory-clear',
+            dataAttribute: OPERATIONS.ADDITIONAL.MCLEAR
+        },
+        memoryReadButton: {
+            style: 'calc-add__button calc-add__button_read js-calc-add__button_read',
+            dataAttribute: OPERATIONS.ADDITIONAL.MREAD
+        },
+        memoryPlusButton: {
+            style: 'calc-add__button calc-add__button_plus js-calc-add__button_plus',
+            dataAttribute: OPERATIONS.ADDITIONAL.MPLUS
+        },
+        memoryMinusButton: {
+            style: 'calc-add__button calc-add__button_minus js-calc-add__button_minus',
+            dataAttribute: OPERATIONS.ADDITIONAL.MMINUS
+        },
+        memorySaveButton: {
+            style: 'calc-add__button calc-add__button_ms js-calc-add__button_ms',
+            dataAttribute: OPERATIONS.ADDITIONAL.MSAVE
+        },
+        memoryOpenButton: {
+            style: 'calc-add__button calc-add__button_memory js-calc-add__button_memory',
+            dataAttribute: OPERATIONS.ADDITIONAL.MEMORY
+        },
+        percentBtn: {
+            style: 'calc__button calc__button_percent js-calc__button_percent',
+            dataAttribute: OPERATIONS.ADDITIONAL.PERCENT,
+            percent: this.percent
+        },
+        sqrtBtn: {
+            style: 'calc__button calc__button_sqrt js-calc__button_sqrt',
+            dataAttribute: OPERATIONS.ADDITIONAL.SQRT,
+            singleOperation: this.singleOperation
+        },
+        powBtn: {
+            style: 'calc__button calc__button_pow js-calc__button_pow',
+            dataAttribute: OPERATIONS.ADDITIONAL.POW,
+            singleOperation: this.singleOperation
+        },
+        fracBtn: {
+            style: 'calc__button calc__button_frac js-calc__button_frac',
+            dataAttribute: OPERATIONS.ADDITIONAL.FRAC,
+            singleOperation: this.singleOperation
+        },
+        ceBtn: {
+            style: 'calc__button calc__button_disabled',
+            dataAttribute: ''
+        },
+        clearBtn: {
+            style: 'calc__button calc__button_clear js-calc__button_clear',
+            dataAttribute: OPERATIONS.ADDITIONAL.CLEAR
+        },
+        backspaceBtn: {
+            style: 'calc__button calc__button_backspace js-calc__button_backspace',
+            dataAttribute: OPERATIONS.ADDITIONAL.BACKSPACE
+        },
+        operationBtn: {
+            style: 'calc__button calc__button_operation js-calc__button_operation',
+            dataAttribute: OPERATIONS.ADDITIONAL.DIVIDE
+        },
+        number: {
+            style: 'calc__button calc__button_number js-calc__button_number',
+            dataAttribute: 'number',
+            updateDisplayValue: this.handleChangeValue
+        },
+        operation: {
+            style: 'calc__button calc__button_operation js-calc__button_operation',
+            dataAttribute: 'operation',
+            operation: this.operation
+        },
+        reverseBtn: {
+            style: 'calc__button calc__button_reverse js-calc__button_reverse',
+            dataAttribute: OPERATIONS.ADDITIONAL.REVERSE
+        },
+        addPointBtn: {
+            style: 'calc__button calc__button_add-point js-calc__button_add-point',
+            dataAttribute: OPERATIONS.ADDITIONAL.POINT
+        },
+        resultBtn: {
+            style: 'calc__button calc__button_get-result js-calc__button_get-result',
+            dataAttribute: OPERATIONS.ADDITIONAL.RESULT
+        }
     }
 
     render() {
         const { displayValue } = this.state;
+        const { isOpenMemoryWindow } = this.state;
         const { isDisabled } = this.state;
         const { displayHistoryValue } = this.state;
         const { displayHiddenHistoryvalue } = this.state;
@@ -926,34 +1012,64 @@ export default class Calculator extends Component {
                             value={displayHistoryValue}
                             displayHiddenHistoryvalue={displayHiddenHistoryvalue}
                         />
-                        <Display
-                            ref={this.display}
-                            value={displayValue}
-                        />
-                        <ButtonArea
-                            clearItemFromMemoryBoard = {this.clearItemFromMemoryBoard}
-                            updateLocalStorage={this.updateLocalStorage}
-                            isOpenMemoryWindow={this.state.isOpenMemoryWindow}
-                            memoryValues={this.stateSettings.memoryValues}
-                            displayValue={displayValue}
-                            updateDisplayValue={this.handleChangeValue}
-                            operation={this.operation}
-                            result={this.result}
-                            clear={this.clear}
-                            addPoint={this.addPoint}
-                            backspace={this.backspace}
-                            reverse={this.reverse}
-                            percent={this.percent}
-                            singleOperation={this.singleOperation}
-                            isDisabled={isDisabled}
-                            isDisabledMemoryButtons={this.stateSettings.isDisabledMemoryButtons}
-                            memoryClear={this.memoryClear}
-                            memoryRead={this.memoryRead}
-                            memoryPlus={this.memoryPlus}
-                            memoryMinus={this.memoryMinus}
-                            memorySave={this.memorySave}
-                            memoryOpen={this.memoryOpen}
-                        />
+                        <Display ref={this.display} value={displayValue} />
+                        <div className="button-area js-button-area">
+                            <div className="calc calc-add">
+                                <Button
+                                    isOpenMemoryWindow={isOpenMemoryWindow}
+                                    isDisabledMemoryButtons={this.stateSettings.isDisabledMemoryButtons}
+                                    btnSettings={this.btnSettings.memoryClearButton}
+                                    memoryClear={this.memoryClear}
+                                >MC</Button>
+                                <Button isOpenMemoryWindow={isOpenMemoryWindow} memoryRead={this.memoryRead} isDisabledMemoryButtons={this.stateSettings.isDisabledMemoryButtons} btnSettings={this.btnSettings.memoryReadButton}>MR</Button>
+                                <Button isOpenMemoryWindow={isOpenMemoryWindow} memoryPlus={this.memoryPlus} btnSettings={this.btnSettings.memoryPlusButton}>M<span>+</span></Button>
+                                <Button isOpenMemoryWindow={isOpenMemoryWindow} memoryMinus={this.memoryMinus} btnSettings={this.btnSettings.memoryMinusButton}>M<span>-</span></Button>
+                                <Button isOpenMemoryWindow={isOpenMemoryWindow} memorySave={this.memorySave} btnSettings={this.btnSettings.memorySaveButton}>MS</Button>
+                                <Button isDisabledMemoryButtons={this.stateSettings.isDisabledMemoryButtons} memoryOpen={this.memoryOpen} btnSettings={this.btnSettings.memoryOpenButton}>M</Button>
+                            </div>
+                            <div className="calc">
+                                <Button isDisabled={isDisabled} percent={this.percent} btnSettings={this.btnSettings.percentBtn}>%</Button>
+                                <Button isDisabled={isDisabled} btnSettings={this.btnSettings.sqrtBtn}>√</Button>
+                                <Button isDisabled={isDisabled} btnSettings={this.btnSettings.powBtn}><span className="span">x</span></Button>
+                                <Button isDisabled={isDisabled} btnSettings={this.btnSettings.fracBtn}><span className="span">/</span></Button>
+                            </div>
+                            <div className="calc">
+                                <Button btnSettings={this.btnSettings.ceBtn}>CE</Button>
+                                <Button btnSettings={this.btnSettings.clearBtn} clear={this.clear}>C</Button>
+                                <Button btnSettings={this.btnSettings.backspaceBtn} backspace={this.backspace}>{`<-`}</Button>
+                                <Button isDisabled={isDisabled} btnSettings={this.btnSettings.operation}>÷</Button>
+                            </div>
+                            <div className="calc">
+                                <Button btnSettings={this.btnSettings.number}>7</Button>
+                                <Button btnSettings={this.btnSettings.number}>8</Button>
+                                <Button btnSettings={this.btnSettings.number}>9</Button>
+                                <Button isDisabled={isDisabled} btnSettings={this.btnSettings.operation}>*</Button>
+                            </div>
+                            <div className="calc">
+                                <Button btnSettings={this.btnSettings.number}>4</Button>
+                                <Button btnSettings={this.btnSettings.number}>5</Button>
+                                <Button btnSettings={this.btnSettings.number}>6</Button>
+                                <Button isDisabled={isDisabled} btnSettings={this.btnSettings.operation}>-</Button>
+                            </div>
+                            <div className="calc">
+                                <Button btnSettings={this.btnSettings.number}>1</Button>
+                                <Button btnSettings={this.btnSettings.number}>2</Button>
+                                <Button btnSettings={this.btnSettings.number}>3</Button>
+                                <Button isDisabled={isDisabled} btnSettings={this.btnSettings.operation}>+</Button>
+                            </div>
+                            <div className="calc">
+                                <Button isDisabled={isDisabled} reverse={this.reverse} btnSettings={this.btnSettings.reverseBtn}>±</Button>
+                                <Button btnSettings={this.btnSettings.number}>0</Button>
+                                <Button isDisabled={isDisabled} addPoint={this.addPoint} btnSettings={this.btnSettings.addPointBtn}>,</Button>
+                                <Button isDisabled={isDisabled} result={this.result} btnSettings={this.btnSettings.resultBtn}>=</Button>
+                            </div>
+                            <Memory
+                                clearItemFromMemoryBoard={this.clearItemFromMemoryBoard}
+                                updateLocalStorage={this.updateLocalStorage}
+                                displayValue={displayValue}
+                                isOpenMemoryWindow={this.state.isOpenMemoryWindow}
+                                memoryValues={this.stateSettings.memoryValues} />
+                        </div>
                     </div>
                 </div>
             </React.Fragment>
