@@ -11,6 +11,14 @@ export default class Memory extends Component {
         memoryValues: PropTypes.array
     }
 
+    static defailtProps = {
+        clearItemFromMemoryBoard: () => {},
+        updateLocalStorage: () => {},
+        displayValue: '',
+        isOpenMemoryWindow: false,
+        memoryValues: []
+    }
+
     render() {
         const { memoryValues } = this.props;
         const { isOpenMemoryWindow } = this.props;
@@ -18,7 +26,7 @@ export default class Memory extends Component {
         const { updateLocalStorage } = this.props;
         const { clearItemFromMemoryBoard } = this.props;
 
-        let classProperties = "memory js-memory";
+        let classProperties = "memory";
 
         const memoryElements = memoryValues.map((memory) =>
             <MemoryBlock
@@ -31,9 +39,10 @@ export default class Memory extends Component {
         );
 
         if (isOpenMemoryWindow) {
+            //
             classProperties += ` visibility`
         } else {
-            classProperties = "memory js-memory";
+            classProperties = "memory";
         }
 
         return (

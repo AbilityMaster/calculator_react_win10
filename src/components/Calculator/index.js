@@ -16,6 +16,7 @@ export default class Calculator extends Component {
         this.VERSION = projectInfo.version;
         this.localStorage = new LocalStorage(this.VERSION, this.NAME);
         this.memory = new Memory();
+        console.log(this.localStorage.dataset);
         this.state = {
             displayValue: '0',
             isDisabled: false,
@@ -26,6 +27,7 @@ export default class Calculator extends Component {
             isDisabledMemoryButtons: true,
             memoryValues: [],
         };
+        //console.log(this.localStorage.dataset.isOpenMemoryWindow);
         this.maxLength = MAX_LENGTH_DISPLAY;
         this.values = [];
         this.smallDisplay = React.createRef();
@@ -738,7 +740,7 @@ export default class Calculator extends Component {
         }
 
         storage = this.localStorage.dataset;
-        this.stateSettings = storage;
+        this.stateSettings = storage;        
         this.memoryArrayOfValues = this.stateSettings.memoryValues;
 
         if (storage.isDisabledMemoryButtons) {
@@ -874,7 +876,9 @@ export default class Calculator extends Component {
         this.localStorage.dataset = this.stateSettings;
     }
 
+    //onClearMemoryItem
     clearItemFromMemoryBoard = (data) => {
+        // find try
         for (let i = 0; i < this.stateSettings.memoryValues.length; i++) {
             if (this.stateSettings.memoryValues[i].id === data.id) {
                 this.stateSettings.memoryValues.splice(i, 1);
@@ -1068,7 +1072,8 @@ export default class Calculator extends Component {
                                 updateLocalStorage={this.updateLocalStorage}
                                 displayValue={displayValue}
                                 isOpenMemoryWindow={this.state.isOpenMemoryWindow}
-                                memoryValues={this.stateSettings.memoryValues} />
+                                memoryValues={this.stateSettings.memoryValues} 
+                            />
                         </div>
                     </div>
                 </div>

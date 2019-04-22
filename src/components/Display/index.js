@@ -22,8 +22,8 @@ export default class Display extends Component {
         return ( 
             <div 
                 ref={this.$display} 
-                style={{ 'display': styleDisplay }} 
-                className="display js-display"
+                style={{ display: styleDisplay }} 
+                className="display"
             >
                 {value}
             </div> 

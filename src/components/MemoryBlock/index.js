@@ -9,6 +9,13 @@ export default class MemoryBlock extends Component {
         memory: PropTypes.object
     }
 
+    static defaultProps = {
+        clearItemFromMemoryBoard: () => {},
+        updateLocalStorage: () => {},
+        displayValue: '',
+        memory: {}
+    }
+
     constructor() {
         super();
         this.$btnMemoryClear = React.createRef();
@@ -54,6 +61,7 @@ export default class MemoryBlock extends Component {
     clear = () => {
         const { clearItemFromMemoryBoard } = this.props;
         const { memory } = this.props;
+
         clearItemFromMemoryBoard(memory);
     }
 

@@ -17,12 +17,11 @@ export default class HistoryDisplay extends Component {
         super();
         this.$smallDisplay = React.createRef();
         this.$hiddenDisplay = React.createRef();
-        this.$buttonMoveLeft = React.createRef();
-        this.$buttonMoveRight = React.createRef();
     }
 
    btnMoveLeft = () => {
         if (this.$smallDisplay.current.clientWidth > MAX_WIDTH_DISPLAY) {
+            // todo: dsa
             this.$smallDisplay.current.style.removeProperty('right');
             this.$smallDisplay.current.style.left = 0;
             this.$smallDisplay.current.style.textAlign = 'left';
@@ -43,7 +42,7 @@ export default class HistoryDisplay extends Component {
 
         return (
             <div className="group-small-display js-group-small-display">
-                <div onClick={this.btnMoveLeft} ref={this.$buttonMoveLeft} className="small-display__button small-display__button_left js-small-display__button_left"></div>
+                <div onClick={this.btnMoveLeft} ref={this.$buttonMoveLeft} className="small-display__button small-display__button_left js-small-display__button_left" />
                 <div className="small-display">
                     <div ref={this.$smallDisplay} className="small-display__block js-small-display__block">{value}</div>
                     <div ref={this.$hiddenDisplay} className="small-display__add js-small-display__add">{displayHiddenHistoryvalue}</div>
