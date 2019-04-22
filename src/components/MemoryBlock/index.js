@@ -23,6 +23,11 @@ export default class MemoryBlock extends Component {
         this.$btnMemoryMinus.current.style.opacity = '0';
     }
 
+    plus = () => {
+        console.log(this.$btnMemoryPlus.current.parentElement.dataset.position);
+        
+    }
+
     render() {
         const { memory } = this.props;
      //   console.log(memory);
@@ -31,9 +36,9 @@ export default class MemoryBlock extends Component {
         return (
             <div onMouseOver={this.handleMouseOver} onMouseOut={this.handleMouseOut} className="memory__block" data-position={memory.position}>
                 <div className="memory__data">{memory.data}</div>
-                <div ref={this.$btnMemoryClear} className="memory__btn memory__btn_mc" style={{ 'opacity': '0', 'cursor': 'pointer' }}>MC</div>
-                <div ref={this.$btnMemoryPlus} className="memory__btn memory__btn_m_plus" style={{ 'opacity': '0', 'cursor': 'pointer' }}>M+</div>
-                <div ref={this.$btnMemoryMinus} className="memory__btn memory__btn_m_minus" style={{ 'opacity': '0', 'cursor': 'pointer' }}>M-</div>
+                <div ref={this.$btnMemoryClear} onClick={this.clear} className="memory__btn memory__btn_mc" style={{ 'opacity': '0', 'cursor': 'pointer' }}>MC</div>
+                <div ref={this.$btnMemoryPlus} onClick={this.plus} className="memory__btn memory__btn_m_plus" style={{ 'opacity': '0', 'cursor': 'pointer' }}>M+</div>
+                <div ref={this.$btnMemoryMinus} onClick={this.minus} className="memory__btn memory__btn_m_minus" style={{ 'opacity': '0', 'cursor': 'pointer' }}>M-</div>
             </div>
         )
     }

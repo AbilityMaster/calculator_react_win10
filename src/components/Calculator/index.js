@@ -39,7 +39,8 @@ export default class Calculator extends Component {
         this.positionAttribute = 0;
         this.currentValue = null;
         this.memoryArrayOfValues = [];
-        this.$calculatorBody = React.createRef();
+        this.$calculatorBody = React.createRef();        
+        this.isOpenMemoryWindow = false;
     }
 
     clear = () => {
@@ -62,7 +63,6 @@ export default class Calculator extends Component {
         this.valueForProgressive = null;
         this.typeOperation = '';
         this.currentValue = null;
-
         this.test = '';
     }
 
@@ -714,38 +714,53 @@ export default class Calculator extends Component {
         this.localStorage.dataset = this.stateSettings;
     };
 
-    memoryPlus() {
-        if (this.state.isOpenMemoryWindow || !isFinite(parseFloat(this.calc.getDisplayData()))) {
+    plus(value, displayValue, position) {
+        
+        this.stateSettings.memoryValues[0].data = String(parseFloat(value) + parseFloat(displayValue));
+        
+        console.log(this.stateSettings.memoryValues[position].data)
+	}
+
+    memoryPlus = () => {
+        if (this.isOpenMemoryWindow || !isFinite(parseFloat(this.getTextDisplay()))) {
             return;
         }
 
-        this.isActivatedMemoryButtons = true;
-        this.storageMemoryData.isActivatedMemoryButtons = this.isActivatedMemoryButtons;
-        this.calc.updateLSData(this.storageMemoryData);
-
-        this.$buttonMemoryRead.classList.remove('calc-add__button_disabled');
-        this.$buttonMemoryClear.classList.remove('calc-add__button_disabled');
-        this.$buttonMemoryOpen.classList.remove('calc-add__button_disabled');
-
-        if (this.isEmpty()) {
-            this.addToMemory(this.calc.getDisplayData());
-        } else {
-            let memoryBlock = document.querySelector('.memory__block');
-
-            let value = memoryBlock.childNodes[0].innerHTML;
-            let displayValue = this.calc.getDisplayData();
-            let position = memoryBlock.dataset.position;
-
-            this.plus(value, displayValue, position);
-
-            memoryBlock.childNodes[0].innerHTML = this.memoryValues[position];
+        if (this.stateSettings.isDisabledMemoryButtons) {
+            this.setState({isDisabledMemoryButtons: false});
+            this.stateSettings.isDisabledMemoryButtons = false;
         }
 
-        this.storageMemoryData.memoryValues = this.memoryValues;
-        this.calc.updateLSData(this.storageMemoryData);
+        if (this.isEmpty()) {
+			this.addToMemory(this.state.displayValue);
+		} else {
+
+            console.log('+');
+			//let memoryBlock = document.querySelector('.memory__block');
+            let value = this.stateSettings.memoryValues[0].data;
+            let displayValue = this.state.displayValue;
+            let position = this.stateSettings.memoryValues[0].position
+            console.log(value, displayValue);
+
+		//	let value = memoryBlock.childNodes[0].innerHTML;
+		//	let displayValue = this.calc.getDisplayData();
+		//	let position = memoryBlock.dataset.position;
+
+            this.plus(value, displayValue, position);
+            
+           // this.addToMemory();
+
+
+		//	memoryBlock.childNodes[0].innerHTML = this.memoryValues[position];
+		}
+
+      
+		this.localStorage.dataset = this.stateSettings;
     }
 
-  
+    isEmpty() {
+		return (Object.keys(this.stateSettings.memoryValues).length === 0);
+	}
 
     loadStateFromLocalStorage() {
 
@@ -818,10 +833,10 @@ export default class Calculator extends Component {
         if (this.state.isOpenMemoryWindow || !isFinite(parseFloat(this.getTextDisplay()))) {
             return;
         }
-
-        if (this.isDisabledMemoryButtons) {
-            console.log('+++++');
+        
+        if (this.stateSettings.isDisabledMemoryButtons) {
             this.setState({isDisabledMemoryButtons: false});
+            this.stateSettings.isDisabledMemoryButtons = false;
         }
 
         this.isDisabledMemoryButtons = false;
@@ -839,8 +854,6 @@ export default class Calculator extends Component {
             return;
         }
 
-        console.log('+');
-
         if (!this.state.isVisualMemoryBoard) {
             this.setState({ isVisualMemoryBoard: true, isOpenMemoryWindow: true });
         } else {
@@ -855,9 +868,10 @@ export default class Calculator extends Component {
 
         
         this.stateSettings.isDisabledMemoryButtons = true;
+        this.stateSettings.positionAttribute = 0;
         this.stateSettings.memoryValues = [];
         this.localStorage.dataset = this.stateSettings;
-        this.setState({ isDisabledMemoryButtons: this.stateSettings.isDisabledMemoryButtons, memoryValues: this.memoryArrayOfValues});
+        this.setState({ isDisabledMemoryButtons: true, memoryValues: []});
         
 
     }
@@ -870,11 +884,6 @@ export default class Calculator extends Component {
         let position = this.stateSettings.memoryValues[this.stateSettings.memoryValues.length - 1].position;
         this.setState({ displayValue: this.stateSettings.memoryValues[position].data});
         this.isEnteredNewValue = true;
-
-		//let position = document.querySelector('.memory__block').dataset.position;
-
-		//this.calc.updateDisplay(this.memoryValues[position]);
-		//this.calc.updateIsEnteredNewValue();
     }
 
     memoryMinus = () => {
@@ -888,7 +897,7 @@ export default class Calculator extends Component {
         const { isDisabled } = this.state;
         const { displayHistoryValue } = this.state;
         const { displayHiddenHistoryvalue } = this.state;
-        const { isDisabledMemoryButtons } = this.state;
+        const { isDisabledMemoryButtons } = this.stateSettings;
 
         this.loadStateFromLocalStorage();
 

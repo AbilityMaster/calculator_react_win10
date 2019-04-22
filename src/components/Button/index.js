@@ -104,20 +104,17 @@ export default class Button extends Component {
         const { isDisabledMemoryButtons } = this.props;
         const { isOpenMemoryWindow } = this.props; 
 
-       
+      // console.log(isDisabledMemoryButtons);
 
         if (isDisabledMemoryButtons) {
-            console.log('+');
             style += ' calc-add__button_disabled';
         }
         
         if (isDisabled) {
-            console.log('+');
             style += ' calc__button_disabled';
         }
         
         if (isOpenMemoryWindow) {
-            console.log('+');
             style += ' calc-add__button_disabled';
         }
 
