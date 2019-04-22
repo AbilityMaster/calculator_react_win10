@@ -155,8 +155,10 @@ export default class ButtonArea extends Component {
         const { isDisabled } = this.props;
         const { isDisabledMemoryButtons } = this.props;
         const { memoryValues } = this.props;
-        const { isVisualMemoryBoard } = this.props;
         const { isOpenMemoryWindow } = this.props;
+        const { displayValue } = this.props;
+        const { updateLocalStorage } = this.props;
+        const { clearItemFromMemoryBoard } = this.props;
 
         return (
             <div className="button-area js-button-area">
@@ -208,7 +210,7 @@ export default class ButtonArea extends Component {
                     <Button isDisabled={isDisabled} btnSettings={this.btnSettings.addPointBtn}>,</Button>
                     <Button isDisabled={isDisabled} btnSettings={this.btnSettings.resultBtn}>=</Button>
                 </div>
-                <Memory isVisualMemoryBoard={isVisualMemoryBoard} memoryValues={memoryValues} />
+                <Memory clearItemFromMemoryBoard={clearItemFromMemoryBoard} updateLocalStorage={updateLocalStorage} displayValue={displayValue} isOpenMemoryWindow={isOpenMemoryWindow} memoryValues={memoryValues} />
             </div>
         )
     }

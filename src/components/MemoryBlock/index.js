@@ -24,14 +24,34 @@ export default class MemoryBlock extends Component {
     }
 
     plus = () => {
-        console.log(this.$btnMemoryPlus.current.parentElement.dataset.position);
-        
+        const { updateLocalStorage } = this.props;
+        const { displayValue } = this.props;
+        const { memory } = this.props;
+
+        memory.data = parseFloat(memory.data) + parseFloat(displayValue);
+        updateLocalStorage(memory);
+        this.setState({ memoryData: memory.data});        
     }
+
+    minus = () => {
+        const { updateLocalStorage } = this.props;
+        const { displayValue } = this.props;
+        const { memory } = this.props;
+
+        memory.data = parseFloat(memory.data) - parseFloat(displayValue);
+        updateLocalStorage(memory);
+        this.setState({ memoryData: memory.data});    
+    }
+
+    clear = () => {
+        const { clearItemFromMemoryBoard } = this.props;
+        const { memory } = this.props;
+        clearItemFromMemoryBoard(memory);
+    }
+
 
     render() {
         const { memory } = this.props;
-     //   console.log(memory);
-
 
         return (
             <div onMouseOver={this.handleMouseOver} onMouseOut={this.handleMouseOut} className="memory__block" data-position={memory.position}>

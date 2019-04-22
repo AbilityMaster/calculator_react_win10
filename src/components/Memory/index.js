@@ -9,14 +9,18 @@ export default class Memory extends Component {
 
     render() {
         const { memoryValues } = this.props;
-        const { isVisualMemoryBoard } = this.props;
+        const { isOpenMemoryWindow } = this.props;
+        const { displayValue } = this.props;
+        const { updateLocalStorage } = this.props;
+        const { clearItemFromMemoryBoard } = this.props;
+        
         let classProperties = "memory js-memory";
 
        const memoryElements = memoryValues.map((memory) =>
-            <MemoryBlock key={memory.id} memory={memory} />
+            <MemoryBlock clearItemFromMemoryBoard={clearItemFromMemoryBoard} updateLocalStorage={updateLocalStorage} displayValue={displayValue} key={memory.id} memory={memory} />
         );
 
-        if (isVisualMemoryBoard) {
+        if (isOpenMemoryWindow) {
             classProperties += ` visibility`
         } else {
             classProperties = "memory js-memory";
