@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import '../../scss/st.scss';
-import { OPERATIONS, MESSAGES, STYLES, MAX_WIDTH_DISPLAY, CALC_MODES, MAX_LENGTH_DISPLAY, NAME_FOR_DISPLAY } from '../../const';
+import { OPERATIONS, MESSAGES, STYLES, CALC_MODES, MAX_LENGTH_DISPLAY, NAME_FOR_DISPLAY } from '../../const';
 import HistoryDisplay from '../HistoryDisplay';
 import Display from '../Display';
 import Button from '../Button';
@@ -23,11 +23,11 @@ export default class Calculator extends Component {
             displayHistoryValue: '',
             displayHiddenHistoryvalue: '',
             displayFontSize: STYLES.NORMAL,
-            mode: (this.localStorage.dataset.isDisabledMemoryButtons) ? this.localStorage.dataset.isDisabledMemoryButtons : CALC_MODES.DEFAULT,
-            positionAttribute: (this.localStorage.dataset.positionAttribute) ? this.localStorage.dataset.positionAttribute : 0,
+            mode: (this.localStorage.isEmpty) ? CALC_MODES.DEFAULT : this.localStorage.dataset.isDisabledMemoryButtons,
+            positionAttribute: (this.localStorage.isEmpty) ? 0 : this.localStorage.dataset.positionAttribute,
             isOpenMemoryWindow: false,
-            isDisabledMemoryButtons: (this.localStorage.dataset.isDisabledMemoryButtons) ? this.localStorage.dataset.isDisabledMemoryButtons : true,
-            memoryValues: (this.localStorage.dataset.memoryValues) ? this.localStorage.dataset.memoryValues : [],
+            isDisabledMemoryButtons: (this.localStorage.isEmpty) ? true : this.localStorage.dataset.isDisabledMemoryButtons,
+            memoryValues: (this.localStorage.isEmpty) ? [] : this.localStorage.dataset.memoryValues,
         };
         this.maxLength = MAX_LENGTH_DISPLAY;
         this.values = [];
@@ -50,7 +50,6 @@ export default class Calculator extends Component {
             this.toggleVisualStateButtons();
         }
 
-
         this.values = [];
         this.setState({
             displayValue: '0',
@@ -67,12 +66,6 @@ export default class Calculator extends Component {
         this.currentValue = null;
     }
 
-
-
-    getWidthSmallDisplay = (data) => {
-        return data;
-    }
-
     SDclear = () => {
         this.setState({ displayHistoryValue: '' });
         this.values = [];
@@ -87,6 +80,7 @@ export default class Calculator extends Component {
             displayHiddenHistoryValue += this.values[i];
             displayHistoryValue += this.values[i];
         }
+        
         this.setState({
             displayHiddenHistoryValue: displayHiddenHistoryValue,
             displayHistoryValue: displayHistoryValue,
@@ -115,10 +109,10 @@ export default class Calculator extends Component {
     getTextDisplay = () => {
         let data = this.formatText(String(this.state.displayValue));
 
-        if (isNaN(data)) {
+        if ((data === MESSAGES.OVERFLOW) || (data === MESSAGES.DIVIDE_BY_ZERO) || (data === MESSAGES.UNCORRECT_DATA)) {
             return data;
-        }
-
+        } 
+        
         // eslint-disable-next-line
         data = data.replace(/\&nbsp\;/g, "\xa0");
         data = data.replace(/\s+/g, '');
@@ -238,13 +232,14 @@ export default class Calculator extends Component {
         if (String(temp).length > this.maxLength) {
             temp = temp.toPrecision(6);
         }
+        
 
         return temp;
     }
 
     sendResult = (operation, result) => {
         this.checkException(operation, result);
-
+        
         if (!this.operationsDisabled) {
             this.setState({
                 displayValue: String(this.formatText(this.trimmer(result)))
@@ -376,6 +371,7 @@ export default class Calculator extends Component {
             this.currentValue = parseFloat(this.getTextDisplay());
         }
 
+        console.log(this.getTextDisplay());
         let result = this.sendOperation(operation, parseFloat(this.getTextDisplay()));
         this.sendResult(operation, result);
     }
@@ -535,6 +531,7 @@ export default class Calculator extends Component {
             return;
         }
 
+        this.typeOperation = null;
         this.operationsDisabled = false;
 
         if (this.getTextDisplay().indexOf('e') !== -1 || this.isPressedSingleOperation) {
@@ -834,15 +831,18 @@ export default class Calculator extends Component {
     }
 
     onClearMemoryItem = (data) => {
-        let deleteMemoryItem = (currentValue, index, arr) => {
-            if (currentValue.id = data.id) {
-                arr.splice(index, 1)
+        /* let deleteMemoryItem = (currentValue, index, arr) => {
+            if (currentValue.id === data.id) {
+                return currentValue;
             }
-
-            return arr;
         }
+        console.log(this.stateSettings.memoryValues.find(deleteMemoryItem)); */
 
-        this.stateSettings.memoryValues.find(deleteMemoryItem);
+        for (let i = 0; i < this.stateSettings.memoryValues.length; i++) {
+            if (this.stateSettings.memoryValues[i].id === data.id) {
+                this.stateSettings.memoryValues.splice(i, 1);
+            }
+        }        
 
         if (this.stateSettings.memoryValues.length === 0) {
             this.stateSettings.isDisabledMemoryButtons = true;
@@ -940,12 +940,7 @@ export default class Calculator extends Component {
     }
 
     render() {
-        const { displayValue } = this.state;
-        const { isOpenMemoryWindow } = this.state;
-        const { isDisabled } = this.state;
-        const { displayHistoryValue } = this.state;
-        const { displayHiddenHistoryvalue } = this.state;
-        const { displayFontSize } = this.state;
+        const { displayValue, isOpenMemoryWindow, isDisabled, displayHistoryValue, displayFontSize } = this.state;
 
         this.loadStateFromLocalStorage();
 
@@ -969,7 +964,7 @@ export default class Calculator extends Component {
                         <div className="option-menu js-option-menu">
                             <div className="option-menu__btn-menu">☰</div>
                             <p className="option-menu__title">Обычный</p>
-                            <div className="option-menu__btn-journal"></div>
+                            <div className="option-menu__btn-journal" />
                         </div>
                         <HistoryDisplay
                             displayHistoryValue={displayHistoryValue}

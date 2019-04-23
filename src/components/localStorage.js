@@ -33,6 +33,9 @@ class LocalStorage {
 		localStorage.setItem(this.key, JSON.stringify(obj));
 	}
 	//true false geter
+	get isEmpty() {
+		return (this.dataset === null)
+	}
 
 	get dataset() {
 		return JSON.parse(localStorage.getItem(this.key));
