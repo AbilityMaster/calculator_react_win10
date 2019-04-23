@@ -64,6 +64,7 @@ export default class Calculator extends Component {
         this.valueForProgressive = null;
         this.typeOperation = '';
         this.currentValue = null;
+        this.typeOperation = null;
     }
 
     SDclear = () => {
@@ -687,25 +688,12 @@ export default class Calculator extends Component {
             memoryValues: []
         };
 
-        let storage = this.localStorage.dataset;
-
-        if (!storage) {
+        if (this.localStorage.isEmpty) {
             this.localStorage.dataset = this.defaultSettings;
         }
 
-        storage = this.localStorage.dataset;
-        this.stateSettings = storage;
-        this.memoryArrayOfValues = this.stateSettings.memoryValues;
-
-        if (storage.isDisabledMemoryButtons) {
-            this.stateSettings.isDisabledMemoryButtons = true;
-        } else {
-            this.stateSettings.isDisabledMemoryButtons = false;
-        }
-
-        this.stateSettings.x = storage.x ? storage.x : this.defaultSettings.x;
-        this.stateSettings.y = storage.y ? storage.y : this.defaultSettings.y;
-        this.manage(storage.mode);
+        this.stateSettings = this.localStorage.dataset;
+        this.manage(this.stateSettings.mode);
     }
 
     addToMemory = (data) => {
@@ -715,10 +703,9 @@ export default class Calculator extends Component {
             position: this.positionAttribute
         }
 
-        this.memoryArrayOfValues.unshift(tempObj);
+        this.stateSettings.memoryValues.unshift(tempObj);
         this.positionAttribute++;
         this.stateSettings.positionAttribute = this.positionAttribute;
-        this.stateSettings.memoryValues = this.memoryArrayOfValues;
     }
 
     memorySave = () => {
@@ -744,8 +731,6 @@ export default class Calculator extends Component {
         if (this.stateSettings.isDisabledMemoryButtons && !this.isOpenMemoryWindow) {
             return;
         }
-
-        this.isOpenMemoryWindow = true;
 
         if (!this.state.isOpenMemoryWindow) {
             this.setState({ isOpenMemoryWindow: true });
@@ -777,7 +762,7 @@ export default class Calculator extends Component {
     }
 
     memoryPlus = () => {
-        if (this.isOpenMemoryWindow || !isFinite(parseFloat(this.getTextDisplay()))) {
+        if (this.state.isOpenMemoryWindow || !isFinite(parseFloat(this.getTextDisplay()))) {
             return;
         }
 
@@ -794,8 +779,11 @@ export default class Calculator extends Component {
 
             this.stateSettings.memoryValues[0].data = String(parseFloat(value) + parseFloat(displayValue));
         }
-
-        this.localStorage.dataset = this.stateSettings;
+        // desctruct
+        
+        this.localStorage.dataset = {
+            memoryValues: this.state.memoryValues
+        } //this.stateSettings;
     }
 
     memoryMinus = () => {

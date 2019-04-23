@@ -34,15 +34,26 @@ export default class HistoryDisplay extends Component {
     }
 
     renderLeftButton = () => {
-       if (this.$smallDisplay.current && this.$smallDisplay.current.scrollWidth > MAX_WIDTH_DISPLAY) {
-            return  <div onClick={this.btnMoveLeft} ref={this.$buttonMoveLeft} className="small-display__button small-display__button_left js-small-display__button_left visibility" />
+        if (this.$smallDisplay.current && this.$smallDisplay.current.scrollWidth > MAX_WIDTH_DISPLAY) {
+            return (
+                <div
+                    onClick={this.btnMoveLeft}
+                    ref={this.$buttonMoveLeft}
+                    className="small-display__button small-display__button_left visibility"
+                />
+            )
         }
         return null;
     }
 
     renderRightButton = () => {
         if (this.$smallDisplay.current && this.$smallDisplay.current.scrollWidth > MAX_WIDTH_DISPLAY) {
-            return  <div onClick={this.btnMoveRight} ref={this.$buttonMoveLeft} className="small-display__button small-display__button_right js-small-display__button_right visibility" />
+            return (
+                <div
+                    onClick={this.btnMoveRight}
+                    ref={this.$buttonMoveLeft}
+                    className="small-display__button small-display__button_right visibility" />
+            )
         }
         return null;
     }
