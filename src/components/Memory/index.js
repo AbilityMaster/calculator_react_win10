@@ -12,25 +12,32 @@ export default class Memory extends Component {
     }
 
     static defailtProps = {
-        clearItemFromMemoryBoard: () => {},
-        updateLocalStorage: () => {},
+        clearItemFromMemoryBoard: () => { },
+        updateLocalStorage: () => { },
         displayValue: '',
         isOpenMemoryWindow: false,
         memoryValues: []
     }
 
-    render() {
-        const { memoryValues } = this.props;
+    get classNames() {
         const { isOpenMemoryWindow } = this.props;
-        const { displayValue } = this.props;
-        const { updateLocalStorage } = this.props;
-        const { clearItemFromMemoryBoard } = this.props;
+        const classNames = ['memory'];
 
-        let classProperties = "memory";
+        if (isOpenMemoryWindow) {
+            classNames.push('visibility');
+
+            return classNames.join(' ');
+        }
+
+        return classNames.join(' ');
+    }
+
+    renderMemoryItems() {
+        const { memoryValues, displayValue, updateLocalStorage, onClearMemoryItem } = this.props;
 
         const memoryElements = memoryValues.map((memory) =>
             <MemoryBlock
-                clearItemFromMemoryBoard={clearItemFromMemoryBoard}
+                onClearMemoryItem={onClearMemoryItem}
                 updateLocalStorage={updateLocalStorage}
                 displayValue={displayValue}
                 key={memory.id}
@@ -38,16 +45,13 @@ export default class Memory extends Component {
             />
         );
 
-        if (isOpenMemoryWindow) {
-            //
-            classProperties += ` visibility`
-        } else {
-            classProperties = "memory";
-        }
+        return memoryElements;
+    }
 
+    render() {
         return (
-            <div className={classProperties}>
-                {memoryElements}
+            <div className={this.classNames}>
+                {this.renderMemoryItems()}
             </div>
         )
     }

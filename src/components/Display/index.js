@@ -1,29 +1,37 @@
 import React, { Component } from 'react';
+import { STYLES } from '../../const';
 import PropTypes from 'prop-types';
 
 export default class Display extends Component {
     static propTypes = {
-        value: PropTypes.string
+        value: PropTypes.string,
+        displayFontSize: PropTypes.string
     };
 
     static defaultProps = {
-        value: ''
+        value: '',
+        displayFontSize: 'normal'
     };
 
-    constructor() {
-        super();
-        this.$display = React.createRef();
+    get classes() {
+        const { displayFontSize } = this.props;
+        const classNames = ['display'];
+
+        if (displayFontSize === STYLES.SMALL) {
+            classNames.push('display_small');
+
+            return classNames.join(' ');
+        }
+
+        return classNames.join(' ');
     }
     
-    render() {
+    render() {        
         const { value } = this.props;
-        const { styleDisplay } = this.props;
 
         return ( 
             <div 
-                ref={this.$display} 
-                style={{ display: styleDisplay }} 
-                className="display"
+                className={this.classes}
             >
                 {value}
             </div> 

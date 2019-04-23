@@ -18,30 +18,20 @@ export default class MemoryBlock extends Component {
 
     constructor() {
         super();
-        this.$btnMemoryClear = React.createRef();
-        this.$btnMemoryPlus = React.createRef();
-        this.$btnMemoryMinus = React.createRef();
+        this.mouseOver = false;
+        this.state = { mouseOverMemoryItem: false };
     }
 
     handleMouseOver = () => {
-        this.$btnMemoryClear.current.style.opacity = '1';
-        this.$btnMemoryClear.current.style.cursor = 'pointer';
-        this.$btnMemoryPlus.current.style.opacity = '1';
-        this.$btnMemoryPlus.current.style.cursor = 'pointer';
-        this.$btnMemoryMinus.current.style.opacity = '1';
-        this.$btnMemoryMinus.current.style.cursor = 'pointer';
+        this.setState({ mouseOverMemoryItem: true });
     }
 
     handleMouseOut = () => {
-        this.$btnMemoryClear.current.style.opacity = '0';
-        this.$btnMemoryPlus.current.style.opacity = '0';
-        this.$btnMemoryMinus.current.style.opacity = '0';
+        this.setState({ mouseOverMemoryItem: false });
     }
 
     plus = () => {
-        const { updateLocalStorage } = this.props;
-        const { displayValue } = this.props;
-        const { memory } = this.props;
+        const { updateLocalStorage, displayValue, memory } = this.props;
 
         memory.data = parseFloat(memory.data) + parseFloat(displayValue);
         updateLocalStorage(memory);
@@ -49,9 +39,7 @@ export default class MemoryBlock extends Component {
     }
 
     minus = () => {
-        const { updateLocalStorage } = this.props;
-        const { displayValue } = this.props;
-        const { memory } = this.props;
+        const { updateLocalStorage, displayValue, memory } = this.props;
 
         memory.data = parseFloat(memory.data) - parseFloat(displayValue);
         updateLocalStorage(memory);
@@ -59,12 +47,25 @@ export default class MemoryBlock extends Component {
     }
 
     clear = () => {
-        const { clearItemFromMemoryBoard } = this.props;
-        const { memory } = this.props;
+        const { onClearMemoryItem, memory } = this.props;
 
-        clearItemFromMemoryBoard(memory);
+        onClearMemoryItem(memory);
     }
 
+    get classNames() {
+        if (this.state.mouseOverMemoryItem) {
+            return {
+                btnMC: "memory__btn memory__btn_mc visible",
+                btnMPlus: "memory__btn memory__btn_m_plus visible",
+                btnMinus: "memory__btn memory__btn_m_minus visible"
+            }
+        }
+        return {
+            btnMC: "memory__btn memory__btn_mc",
+            btnMPlus: "memory__btn memory__btn_m_plus",
+            btnMinus: "memory__btn memory__btn_m_minus"
+        }
+    }
 
     render() {
         const { memory } = this.props;
@@ -72,9 +73,9 @@ export default class MemoryBlock extends Component {
         return (
             <div onMouseOver={this.handleMouseOver} onMouseOut={this.handleMouseOut} className="memory__block" data-position={memory.position}>
                 <div className="memory__data">{memory.data}</div>
-                <div ref={this.$btnMemoryClear} onClick={this.clear} className="memory__btn memory__btn_mc" style={{ 'opacity': '0', 'cursor': 'pointer' }}>MC</div>
-                <div ref={this.$btnMemoryPlus} onClick={this.plus} className="memory__btn memory__btn_m_plus" style={{ 'opacity': '0', 'cursor': 'pointer' }}>M+</div>
-                <div ref={this.$btnMemoryMinus} onClick={this.minus} className="memory__btn memory__btn_m_minus" style={{ 'opacity': '0', 'cursor': 'pointer' }}>M-</div>
+                <div onClick={this.clear} className={this.classNames.btnMC}>MC</div>
+                <div onClick={this.plus} className={this.classNames.btnMPlus}>M+</div>
+                <div onClick={this.minus} className={this.classNames.btnMinus}>M-</div>
             </div>
         )
     }

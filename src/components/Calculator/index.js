@@ -16,24 +16,24 @@ export default class Calculator extends Component {
         this.VERSION = projectInfo.version;
         this.localStorage = new LocalStorage(this.VERSION, this.NAME);
         this.memory = new Memory();
-        console.log(this.localStorage.dataset);
         this.state = {
+            valuesHistoryDisplay: [],
             displayValue: '0',
             isDisabled: false,
             displayHistoryValue: '',
             displayHiddenHistoryvalue: '',
-            mode: CALC_MODES.DEFAULT,
+            displayFontSize: STYLES.NORMAL,
+            mode: (this.localStorage.dataset.isDisabledMemoryButtons) ? this.localStorage.dataset.isDisabledMemoryButtons : CALC_MODES.DEFAULT,
+            positionAttribute: (this.localStorage.dataset.positionAttribute) ? this.localStorage.dataset.positionAttribute : 0,
             isOpenMemoryWindow: false,
-            isDisabledMemoryButtons: true,
-            memoryValues: [],
+            isDisabledMemoryButtons: (this.localStorage.dataset.isDisabledMemoryButtons) ? this.localStorage.dataset.isDisabledMemoryButtons : true,
+            memoryValues: (this.localStorage.dataset.memoryValues) ? this.localStorage.dataset.memoryValues : [],
         };
-        //console.log(this.localStorage.dataset.isOpenMemoryWindow);
         this.maxLength = MAX_LENGTH_DISPLAY;
         this.values = [];
         this.smallDisplay = React.createRef();
-        this.historyDisplay = React.createRef();
-        this.display = React.createRef();
         this.$calculator = React.createRef();
+        this.$calculatorBody = React.createRef();
         this.stateSettings = {};
         this.styleSettings = {};
         this.memoryValues = {};
@@ -41,22 +41,22 @@ export default class Calculator extends Component {
         this.typeOperation = null;
         this.currentValue = null;
         this.memoryArrayOfValues = [];
-        this.$calculatorBody = React.createRef();
         this.isOpenMemoryWindow = false;
     }
 
     clear = () => {
         if (this.operationsDisabled) {
-            this.display.current.$display.current.style.fontSize = STYLES.NORMAL;
+            this.setState({ displayFontSize: STYLES.NORMAL });
             this.toggleVisualStateButtons();
         }
 
-        this.setState({ displayValue: '0', isDisabled: false, displayHistoryValue: '', displayHiddenHistoryvalue: '' });
+
         this.values = [];
-        this.historyDisplay.current.$hiddenDisplay.current.style.width = '';
-        this.historyDisplay.current.$smallDisplay.current.style.width = '';
-        this.historyDisplay.current.$buttonMoveLeft.current.style.visibility = 'hidden';
-        this.historyDisplay.current.$buttonMoveRight.current.style.visibility = 'hidden';
+        this.setState({
+            displayValue: '0',
+            isDisabled: false,
+            displayHistoryValue: ''
+        });
         this.operationsDisabled = false;
         this.isResultPressed = false;
         this.isOperationPressed = false;
@@ -65,55 +65,32 @@ export default class Calculator extends Component {
         this.valueForProgressive = null;
         this.typeOperation = '';
         this.currentValue = null;
-        this.test = '';
+    }
+
+
+
+    getWidthSmallDisplay = (data) => {
+        return data;
     }
 
     SDclear = () => {
         this.setState({ displayHistoryValue: '' });
         this.values = [];
-
-        if ((this.historyDisplay.current.$smallDisplay.current.clientWidth) >= MAX_WIDTH_DISPLAY) {
-            this.historyDisplay.current.$buttonMoveLeft.current.style.visibility = 'hidden';
-            this.historyDisplay.current.$buttonMoveRight.current.style.visibility = 'hidden';
-            this.historyDisplay.current.$smallDisplay.current.style.left = '';
-            this.historyDisplay.current.$smallDisplay.current.style.width = '';
-        }
     }
 
     SDclearLastValue = () => {
-        this.setState({ displayHistoryValue: '' });
+        let displayHistoryValue = ''
+        let displayHiddenHistoryValue = '';
+
         this.values.pop();
         for (let i = 0; i < this.values.length; i++) {
-            this.setState(state => ({
-                displayHiddenHistoryvalue: state.displayHiddenHistoryvalue + this.values[i],
-                displayHistoryValue: state.displayHistoryValue + this.values[i],
-            }))
+            displayHiddenHistoryValue += this.values[i];
+            displayHistoryValue += this.values[i];
         }
-    }
-
-    updateWitdhDisplay = (type, isPressedSingleOperation, temp) => {
-        if (type === OPERATIONS.LABEL_DEFAULT_OPERATION && !isPressedSingleOperation) {
-            this.setState({ displayHiddenHistoryvalue: `${this.values[this.values.length - 2]}${this.values[this.values.length - 1]}` });
-        } else {
-            this.setState({ displayHiddenHistoryvalue: this.values[this.values.length - 1] });
-        }
-
-        if (temp) {
-            this.setState({ displayHiddenHistoryvalue: this.variableForSingleOperationGetWidth });
-        }
-
-        let width = this.historyDisplay.current.$smallDisplay.current.clientWidth;
-
-        if (this.values.length === 1) {
-            width = 0;
-        }
-
-        if ((width + this.historyDisplay.current.$hiddenDisplay.current.clientWidth) >= MAX_WIDTH_DISPLAY) {
-            this.historyDisplay.current.$buttonMoveLeft.current.style.visibility = 'visible';
-            this.historyDisplay.current.$buttonMoveRight.current.style.visibility = 'visible';
-            this.historyDisplay.current.$smallDisplay.current.style.left = '';
-            this.historyDisplay.current.$smallDisplay.current.style.width = width + this.historyDisplay.current.$hiddenDisplay.current.clientWidth + 'px';
-        }
+        this.setState({
+            displayHiddenHistoryValue: displayHiddenHistoryValue,
+            displayHistoryValue: displayHistoryValue,
+        });
     }
 
     updateSmallDisplay = () => {
@@ -138,6 +115,10 @@ export default class Calculator extends Component {
     getTextDisplay = () => {
         let data = this.formatText(String(this.state.displayValue));
 
+        if (isNaN(data)) {
+            return data;
+        }
+
         // eslint-disable-next-line
         data = data.replace(/\&nbsp\;/g, "\xa0");
         data = data.replace(/\s+/g, '');
@@ -152,11 +133,11 @@ export default class Calculator extends Component {
             this.clear();
             this.toggleVisualStateButtons();
             this.typeOperation = null;
+            this.setState({ displayFontSize: STYLES.NORMAL });
         }
 
         this.updateSmallDisplay();
         this.isEnteredNewValue = true;
-        this.display.current.$display.current.style.fontSize = STYLES.NORMAL;
         this.isPressedSingleOperation = false;
 
         if ((this.state.displayValue === '0' || (this.isNeedNewValueInDisplay) || (this.isResultPressed && this.state.displayValue !== '0.') || this.state.displayValue === MESSAGES.DIVIDE_BY_ZERO)) {
@@ -189,23 +170,27 @@ export default class Calculator extends Component {
             case OPERATIONS.MULTIPLY:
             case OPERATIONS.PERCENT:
             case OPERATIONS.NEGATE: {
-                if (!isFinite(result)) {
-                    this.toggleVisualStateButtons();
-                    this.display.current.$display.current.style.fontSize = STYLES.SMALL;
-                    this.setState({ isDisabled: true });
-                    this.setState({ displayValue: MESSAGES.OVERFLOW });
+                if (!isFinite(result)) {                    
                     this.operationsDisabled = true;
+                    this.toggleVisualStateButtons();
+                    this.setState({
+                        displayFontSize: STYLES.SMALL,
+                        isDisabled: true,
+                        displayValue: MESSAGES.OVERFLOW
+                    });
                 }
 
                 break;
             }
             case OPERATIONS.DIVIDE: {
-                if (this.valueForProgressive === 0 || parseFloat(this.display.text) === 0) {
+                if (this.valueForProgressive === 0 || parseFloat(this.getTextDisplay()) === 0) {
                     this.operationsDisabled = true;
                     this.toggleVisualStateButtons();
-                    this.display.current.$display.current.style.fontSize = STYLES.SMALL;
-                    this.setState({ isDisabled: true });
-                    this.setState({ displayValue: MESSAGES.DIVIDE_BY_ZERO });
+                    this.setState({
+                        displayFontSize: STYLES.SMALL,
+                        isDisabled: true,
+                        displayValue: MESSAGES.DIVIDE_BY_ZERO
+                    });
                 }
 
                 break;
@@ -214,20 +199,24 @@ export default class Calculator extends Component {
                 if (parseFloat(this.state.displayValue) === 0) {
                     this.operationsDisabled = true;
                     this.toggleVisualStateButtons();
-                    this.display.current.$display.current.style.fontSize = STYLES.SMALL;
-                    this.setState({ isDisabled: true });
-                    this.setState({ displayValue: MESSAGES.DIVIDE_BY_ZERO });
+                    this.setState({
+                        displayFontSize: STYLES.SMALL,
+                        isDisabled: true,
+                        displayValue: MESSAGES.DIVIDE_BY_ZERO
+                    });
                 }
 
                 break;
             }
             case OPERATIONS.SQRT: {
                 if (parseFloat(this.state.displayValue) < 0) {
-                    this.toggleVisualStateButtons();
-                    this.setState({ isDisabled: true });
-                    this.display.current.$display.current.style.fontSize = STYLES.SMALL;
-                    this.setState({ displayValue: MESSAGES.UNCORRECT_DATA });
                     this.operationsDisabled = true;
+                    this.toggleVisualStateButtons();
+                    this.setState({
+                        displayFontSize: STYLES.SMALL,
+                        isDisabled: true,
+                        displayValue: MESSAGES.UNCORRECT_DATA
+                    });
                 }
 
                 break;
@@ -268,23 +257,27 @@ export default class Calculator extends Component {
         }
     };
 
-    sendToSmallDisplay = (type, operation, result, isPressedSingleOperation, isEnteredNewValue, isResultPressed) => {
-        this.historyDisplay.current.$smallDisplay.current.style.removeProperty('left');
-        this.historyDisplay.current.$smallDisplay.current.style.right = 0;
-        this.historyDisplay.current.$smallDisplay.current.style.textAlign = 'right';
+    sendData() {
+        let textData = '';
 
+        for (let i = 0; i < this.values.length; i++) {
+            textData += this.values[i];
+        }
+
+        this.setState({ displayHistoryValue: textData });
+    }
+
+    sendToHistoryDisplay = (type, operation, result, isPressedSingleOperation, isEnteredNewValue, isResultPressed) => {
         switch (type) {
             case OPERATIONS.PERCENT: {
                 if (!isPressedSingleOperation) {
                     this.values.push(parseFloat(result));
-                    this.updateWitdhDisplay(type, isPressedSingleOperation);
                     this.sendData();
 
                     return;
                 }
 
                 this.values[this.values.length - 1] = parseFloat(result);
-                this.updateWitdhDisplay(type, isPressedSingleOperation);
                 this.sendData();
 
                 break;
@@ -293,14 +286,12 @@ export default class Calculator extends Component {
                 if (!isPressedSingleOperation) {
                     this.values.push(`${NAME_FOR_DISPLAY[operation]}(${parseFloat(this.getTextDisplay())})`);
                     this.variableForSingleOperationGetWidth = this.values[this.values.length - 1];
-                    this.updateWitdhDisplay(type, isPressedSingleOperation);
                     this.sendData();
 
                     return;
                 }
 
                 this.values[this.values.length - 1] = `${NAME_FOR_DISPLAY[operation]}(${this.values[this.values.length - 1]})`;
-                this.updateWitdhDisplay(type, isPressedSingleOperation, this.variableForSingleOperationGetWidth);
                 this.sendData();
 
                 break;
@@ -308,7 +299,6 @@ export default class Calculator extends Component {
             case OPERATIONS.LABEL_DEFAULT_OPERATION: {
                 if (isPressedSingleOperation) {
                     this.values.push(` ${operation} `);
-                    this.updateWitdhDisplay(type, isPressedSingleOperation);
                     this.sendData();
 
                     return;
@@ -317,14 +307,12 @@ export default class Calculator extends Component {
                 if (isEnteredNewValue || isResultPressed) {
                     this.values.push(parseFloat(this.getTextDisplay()));
                     this.values.push(` ${operation} `);
-                    this.updateWitdhDisplay(type, isPressedSingleOperation);
                     this.sendData();
 
                     return;
                 }
 
                 this.values[this.values.length - 1] = ` ${operation} `;
-                this.updateWitdhDisplay(type, isPressedSingleOperation);
                 this.sendData();
 
                 break;
@@ -347,7 +335,7 @@ export default class Calculator extends Component {
 
         this.isNeedValueForProgressive = true;
         this.isNeedNewValueInDisplay = true;
-        this.sendToSmallDisplay(OPERATIONS.LABEL_DEFAULT_OPERATION, operation, this.currentValue, this.isPressedSingleOperation, this.isEnteredNewValue, this.isResultPressed);
+        this.sendToHistoryDisplay(OPERATIONS.LABEL_DEFAULT_OPERATION, operation, this.currentValue, this.isPressedSingleOperation, this.isEnteredNewValue, this.isResultPressed);
         this.isResultPressed = false;
         this.isPressedSingleOperation = false;
 
@@ -381,7 +369,7 @@ export default class Calculator extends Component {
 
         this.isNeedNewValueInDisplay = true;
         // eslint-disable-next-line
-        this.sendToSmallDisplay(OPERATIONS.LABEL_SINGLE_OPERATION, operation, result, this.isPressedSingleOperation);
+        this.sendToHistoryDisplay(OPERATIONS.LABEL_SINGLE_OPERATION, operation, result, this.isPressedSingleOperation);
         this.isPressedSingleOperation = true;
 
         if (this.currentValue === null) {
@@ -453,40 +441,6 @@ export default class Calculator extends Component {
                 console.log(MESSAGES.ERROR.OPERATIONS);
                 break;
             }
-        }
-    }
-
-    sendData() {
-        this.setState({ displayHistoryValue: '' })
-        for (let i = 0; i < this.values.length; i++) {
-            this.setState(state => ({ displayHistoryValue: state.displayHistoryValue + this.values[i] }));
-        }
-    }
-
-    updateWitdhDisplay = (type, isPressedSingleOperation, temp) => {
-        if (type === OPERATIONS.LABEL_SINGLE_OPERATION && this.typeOperation === undefined) {
-            this.setState({ displayHiddenHistoryvalue: this.variableForSingleOperationGetWidth });
-        }
-
-        if (type === OPERATIONS.LABEL_DEFAULT_OPERATION && !isPressedSingleOperation) {
-            this.setState({ displayHiddenHistoryvalue: `${this.values[this.values.length - 2]}${this.values[this.values.length - 1]}` });
-        }
-
-        if (type === OPERATIONS.LABEL_SINGLE_OPERATION && this.typeOperation !== undefined) {
-            this.setState({ displayHiddenHistoryvalue: this.variableForSingleOperationGetWidth });
-        }
-
-        let width = this.historyDisplay.current.$smallDisplay.current.clientWidth;
-
-        if ((this.values.length === 1) && type !== OPERATIONS.LABEL_SINGLE_OPERATION) {
-            width = 0;
-        }
-
-        if ((width + this.historyDisplay.current.$hiddenDisplay.current.clientWidth) >= MAX_WIDTH_DISPLAY) {
-            this.historyDisplay.current.$buttonMoveLeft.current.style.visibility = 'visible';
-            this.historyDisplay.current.$buttonMoveRight.current.style.visibility = 'visible';
-            this.historyDisplay.current.$smallDisplay.current.style.left = '';
-            this.historyDisplay.current.$smallDisplay.current.style.width = width + this.historyDisplay.current.$hiddenDisplay.current.clientWidth + 'px';
         }
     }
 
@@ -588,16 +542,19 @@ export default class Calculator extends Component {
         }
 
         if ((this.getTextDisplay().length === 2 && this.getTextDisplay()[0] === '-') || this.state.displayValue.length === 1) {
-            this.setState({ displayValue: '0' });
+            this.setState({ 
+                displayValue: '0' 
+            });
 
             return;
         }
 
         if (this.getTextDisplay() === MESSAGES.DIVIDE_BY_ZERO || this.getTextDisplay() === MESSAGES.OVERFLOW || this.getTextDisplay() === MESSAGES.UNCORRECT_DATA) {
-            //this.display.text = '';
-            //this.display.$display.style.fontSize = STYLES.NORMAL;
-            this.setState({ displayValue: '0' });
-            //this.updateStateDisabledButtons();
+            this.setState({
+                displayFontSize: STYLES.NORMAL,
+                displayValue: '0'
+            });
+            this.toggleVisualStateButtons();
 
             return;
         }
@@ -617,7 +574,7 @@ export default class Calculator extends Component {
         if (this.getTextDisplay() === '0' || this.isResultPressed) {
             this.isEnteredNewValue = true;
             this.isNeedNewValueInDisplay = true;
-            this.sendToSmallDisplay(OPERATIONS.LABEL_SINGLE_OPERATION, OPERATIONS.NEGATE, this.valueForProgressive, this.isPressedSingleOperation);
+            this.sendToHistoryDisplay(OPERATIONS.LABEL_SINGLE_OPERATION, OPERATIONS.NEGATE, this.valueForProgressive, this.isPressedSingleOperation);
         }
 
         this.isPressedSingleOperation = true;
@@ -642,7 +599,7 @@ export default class Calculator extends Component {
 
         let result = this.sendOperation(OPERATIONS.PERCENT, this.currentValue, parseFloat(this.getTextDisplay()));
         this.sendResult(OPERATIONS.PERCENT, result);
-        this.sendToSmallDisplay(OPERATIONS.PERCENT, OPERATIONS.PERCENT, this.trimmer(result), this.isPressedSingleOperation);
+        this.sendToHistoryDisplay(OPERATIONS.PERCENT, OPERATIONS.PERCENT, this.trimmer(result), this.isPressedSingleOperation);
         this.isPressedSingleOperation = true;
         this.isNeedNewValueInDisplay = true;
     }
@@ -740,7 +697,7 @@ export default class Calculator extends Component {
         }
 
         storage = this.localStorage.dataset;
-        this.stateSettings = storage;        
+        this.stateSettings = storage;
         this.memoryArrayOfValues = this.stateSettings.memoryValues;
 
         if (storage.isDisabledMemoryButtons) {
@@ -876,14 +833,16 @@ export default class Calculator extends Component {
         this.localStorage.dataset = this.stateSettings;
     }
 
-    //onClearMemoryItem
-    clearItemFromMemoryBoard = (data) => {
-        // find try
-        for (let i = 0; i < this.stateSettings.memoryValues.length; i++) {
-            if (this.stateSettings.memoryValues[i].id === data.id) {
-                this.stateSettings.memoryValues.splice(i, 1);
+    onClearMemoryItem = (data) => {
+        let deleteMemoryItem = (currentValue, index, arr) => {
+            if (currentValue.id = data.id) {
+                arr.splice(index, 1)
             }
+
+            return arr;
         }
+
+        this.stateSettings.memoryValues.find(deleteMemoryItem);
 
         if (this.stateSettings.memoryValues.length === 0) {
             this.stateSettings.isDisabledMemoryButtons = true;
@@ -986,6 +945,7 @@ export default class Calculator extends Component {
         const { isDisabled } = this.state;
         const { displayHistoryValue } = this.state;
         const { displayHiddenHistoryvalue } = this.state;
+        const { displayFontSize } = this.state;
 
         this.loadStateFromLocalStorage();
 
@@ -1012,11 +972,12 @@ export default class Calculator extends Component {
                             <div className="option-menu__btn-journal"></div>
                         </div>
                         <HistoryDisplay
-                            ref={this.historyDisplay}
-                            value={displayHistoryValue}
-                            displayHiddenHistoryvalue={displayHiddenHistoryvalue}
+                            displayHistoryValue={displayHistoryValue}
                         />
-                        <Display ref={this.display} value={displayValue} />
+                        <Display
+                            displayFontSize={displayFontSize}
+                            value={displayValue}
+                        />
                         <div className="button-area js-button-area">
                             <div className="calc calc-add">
                                 <Button
@@ -1068,11 +1029,11 @@ export default class Calculator extends Component {
                                 <Button isDisabled={isDisabled} result={this.result} btnSettings={this.btnSettings.resultBtn}>=</Button>
                             </div>
                             <Memory
-                                clearItemFromMemoryBoard={this.clearItemFromMemoryBoard}
+                                onClearMemoryItem={this.onClearMemoryItem}
                                 updateLocalStorage={this.updateLocalStorage}
                                 displayValue={displayValue}
                                 isOpenMemoryWindow={this.state.isOpenMemoryWindow}
-                                memoryValues={this.stateSettings.memoryValues} 
+                                memoryValues={this.stateSettings.memoryValues}
                             />
                         </div>
                     </div>

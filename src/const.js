@@ -22,8 +22,8 @@ export const MESSAGES = {
 };
 
 export const STYLES = {
-	SMALL: '20px',
-	NORMAL: '45px'
+	SMALL: 'small',
+	NORMAL: 'normal'
 };
 
 export const OPERATIONS = {

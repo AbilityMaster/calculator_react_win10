@@ -124,6 +124,7 @@ body, html {
 	position: relative;
 	display: flex;
 	align-items: center;
+	justify-content: flex-end;
 }
 .small-display {
 	height: 20px;
@@ -131,8 +132,16 @@ body, html {
 	position: relative;
 	overflow: hidden;
 	text-align: right;
-	width: 100%;
 	margin: 0 17px;
+	white-space: nowrap;
+	line-height: 20px;
+	overflow-x: scroll;
+	&::-webkit-scrollbar { 
+		width: 0 !important;
+  		height: 0;
+		display: none !important;
+ 		background: transparent;
+	}
 	&__block {
 		width: auto;
 		position: absolute;
@@ -152,23 +161,22 @@ body, html {
 		width: 20px;
 		&_left {
 			left: 0;
-			background: url('../img/left.png');
-			background-size: cover;
-			visibility: hidden;
+			width: 20px;
+			background: url('../img/left.png') no-repeat center;
+			background-size: contain;
 			&:hover {
-				background: url('../img/left-hov.png') #d0d0d0;
-				background-size: cover;
+				background: url('../img/left-hov.png') no-repeat center #d0d0d0;
+				background-size: contain;
 				cursor: pointer;
 			}
 		}
 		&_right {
 			right: 0;
-			background: url('../img/right.png');
-			background-size: cover;
-			visibility: hidden;
+			background: url('../img/right.png') no-repeat center;
+			background-size: contain;
 			&:hover {
-				background: url('../img/right-hov.png') #d0d0d0;
-				background-size: cover;
+				background: url('../img/right-hov.png') no-repeat center #d0d0d0;
+				background-size: contain;
 				cursor: pointer;
 			}
 		}
@@ -295,6 +303,7 @@ body, html {
 	background: url(../img/back.png);
 	overflow-y: scroll;
 	&__btn {
+		opacity: 0;
 		display: inline-block;
 		font-size: 18px;
 		background: #fdfdfd;
@@ -319,10 +328,20 @@ body, html {
 		text-align: right;
 		&:hover {
 			background: #dbdbdb;
+			cursor: default;
 		}
 	}
 }
 
+.visible {
+	opacity: 1;
+	cursor: pointer;
+}
+
 .visibility {
 	visibility: visible;
+}
+
+.display_small {
+	font-size: 20px;
 }

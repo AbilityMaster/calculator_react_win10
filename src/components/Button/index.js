@@ -140,9 +140,7 @@ export default class Button extends Component {
     }
 
     get className() {
-        const { isDisabled } = this.props;
-        const { isDisabledMemoryButtons } = this.props;
-        const { isOpenMemoryWindow } = this.props;
+        const { isDisabled, isDisabledMemoryButtons, isOpenMemoryWindow } = this.props;
         const { style } = this.props.btnSettings;
         const classNames = [style];
 
