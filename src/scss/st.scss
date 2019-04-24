@@ -345,3 +345,21 @@ body, html {
 .display_small {
 	font-size: 20px;
 }
+
+.standart {
+	display: block;
+	height: 540px;
+}
+
+.minimized {
+	height: 32px;
+	bottom: auto;
+}
+
+.displayBlock {
+	display: block;
+}
+
+.closed {
+	display: none;
+}

@@ -12,7 +12,7 @@ import '../../scss/st.scss';
 export default class Calculator extends Component {
     constructor() {
         super();
-        this.localStorage = new LocalStorage(projectInfo.name, projectInfo.version);
+        this.localStorage = new LocalStorage(projectInfo.version, projectInfo.name);
         this.state = {
             isDisabledOperations: false,
             isResultPressed: false,
@@ -29,6 +29,7 @@ export default class Calculator extends Component {
             displayHistoryValue: '',
             displayFontSize: STYLES.NORMAL,
             isOpenMemoryWindow: false,
+            historyValues: [],
             isDisabledMemoryButtonsAll: false,
             isDisabledMemoryButtons: (this.localStorage.isEmpty) ? true : this.localStorage.dataset.isDisabledMemoryButtons,
             memoryValues: (this.localStorage.isEmpty) ? [] : this.localStorage.dataset.memoryValues,
@@ -39,14 +40,8 @@ export default class Calculator extends Component {
             x: (this.localStorage.isEmpty) ? `${(window.innerWidth - 320) / window.innerWidth * 100}%` : this.localStorage.dataset.x,
             y: (this.localStorage.isEmpty) ? `${(window.innerHeight - 540) / window.innerHeight * 100}%` : this.localStorage.dataset.y
         };
-        this.historyValues = [];
-        this.smallDisplay = React.createRef();
         this.$calculator = React.createRef();
         this.$calculatorBody = React.createRef();
-        this.styleSettings = {};
-        //   this.typeOperation = null;
-        //   this.currentValue = null;
-        this.manage(this.state.mode);
     }
 
     clear = () => {
@@ -55,7 +50,6 @@ export default class Calculator extends Component {
             this.toggleVisualStateButtons();
         }
 
-        this.historyValuesInHistoryDisplay = [];
         this.setState({
             isPressedSingleOperation: false,
             displayValue: '0',
@@ -69,31 +63,26 @@ export default class Calculator extends Component {
             valueForProgressive: null,
             currentValue: null,
             typeOperation: null,
-            isEnteredNewValue: true
+            isEnteredNewValue: true,
+            historyValues: []
         });
-        // to do state       
-
-        //  this.operationsDisabled = false;
-        //  this.isResultPressed = false;
-        //  this.isOperationPressed = false;
-        //   this.isNeedValueForProgressive = false;
-        //  this.isNeedNewValueToDisplay = false;
-        //   this.valueForProgressive = null;
-        //   this.currentValue = null;
-        //  this.typeOperation = null;
     }
 
     SDclear = () => {
-        this.setState({ displayHistoryValue: '' });
-        this.historyValues = [];
+        this.setState({ displayHistoryValue: '', historyValues: [] });
     }
 
     SDclearLastValue = () => {
-        let displayHistoryValue = ''
+        const { historyValues } = this.state;
+        let displayHistoryValue = '';
 
-        this.historyValues.pop();
-        for (let i = 0; i < this.historyValues.length; i++) {
-            displayHistoryValue += this.historyValues[i];
+        historyValues.pop()
+        this.setState({
+            historyValues
+        });
+
+        for (let i = 0; i < this.state.historyValues.length; i++) {
+            displayHistoryValue += this.state.historyValues[i];
         }
 
         this.setState({
@@ -143,8 +132,6 @@ export default class Calculator extends Component {
             isEnteredNewValue: true,
             isPressedSingleOperation: false
         });
-        //this.isEnteredNewValue = true;
-        //this.isPressedSingleOperation = false;
 
         if ((this.state.displayValue === '0' || (this.state.isNeedNewValueInDisplay) || (this.state.isResultPressed && this.state.displayValue !== '0.') || this.state.displayValue === MESSAGES.DIVIDE_BY_ZERO)) {
             this.setState({
@@ -152,8 +139,6 @@ export default class Calculator extends Component {
                 isResultPressed: false,
                 isNeedNewValueInDisplay: false
             });
-            //this.isNeedNewValueInDisplay = false;
-            // this.isResultPressed = false;
 
             return;
         }
@@ -163,7 +148,6 @@ export default class Calculator extends Component {
                 displayValue: this.formatText(`${this.getTextDisplay()}${displayValue}`),
                 isResultPressed: false
             });
-            //   this.isResultPressed = false;
 
             return;
         }
@@ -263,7 +247,6 @@ export default class Calculator extends Component {
         return temp;
     }
 
-
     sendResult = (operation, result) => {
         if (this.isValueCorrect(operation, result)) {
             this.setState({
@@ -273,70 +256,87 @@ export default class Calculator extends Component {
 
         if ((operation !== OPERATIONS.PERCENT) && (operation !== OPERATIONS.POW) &&
             (operation !== OPERATIONS.FRAC) && (operation !== OPERATIONS.SQRT)) {
-            //this.setState({ currentValue: this.trimmer(result) });
-             this.currentValue = this.trimmer(result);
+            this.setState({ currentValue: this.trimmer(result) });
         }
     };
-
-
-
 
     sendData() {
         let textData = '';
 
-        for (let i = 0; i < this.historyValues.length; i++) {
-            textData += this.historyValues[i];
+        for (let i = 0; i < this.state.historyValues.length; i++) {
+            textData += this.state.historyValues[i];
         }
 
         this.setState({ displayHistoryValue: textData });
     }
 
     sendToHistoryDisplay = (type, operation, result, isPressedSingleOperation, isEnteredNewValue, isResultPressed) => {
+        const { historyValues } = this.state;
+
         switch (type) {
             case OPERATIONS.PERCENT: {
                 if (!isPressedSingleOperation) {
-                    this.historyValues.push(parseFloat(result));
+                    historyValues.push(result)
+                    this.setState({
+                        historyValues
+                    });
                     this.sendData();
 
                     return;
                 }
 
-                this.historyValues[this.historyValues.length - 1] = parseFloat(result);
+                historyValues[historyValues.length - 1] = parseFloat(result);
+                this.setState({
+                    historyValues
+                });
                 this.sendData();
 
                 break;
             }
             case OPERATIONS.LABEL_SINGLE_OPERATION: {
                 if (!isPressedSingleOperation) {
-                    this.historyValues.push(`${NAME_FOR_DISPLAY[operation]}(${parseFloat(this.getTextDisplay())})`);
-                    this.variableForSingleOperationGetWidth = this.historyValues[this.historyValues.length - 1];
+                    historyValues.push(`${NAME_FOR_DISPLAY[operation]}(${parseFloat(this.getTextDisplay())})`);
+                    this.setState({
+                        historyValues
+                    });
                     this.sendData();
 
                     return;
                 }
 
-                this.historyValues[this.historyValues.length - 1] = `${NAME_FOR_DISPLAY[operation]}(${this.historyValues[this.historyValues.length - 1]})`;
+                historyValues[historyValues.length - 1] = `${NAME_FOR_DISPLAY[operation]}(${historyValues[historyValues.length - 1]})`;
+                this.setState({
+                    historyValues
+                });           
                 this.sendData();
 
                 break;
             }
             case OPERATIONS.LABEL_DEFAULT_OPERATION: {
                 if (isPressedSingleOperation) {
-                    this.historyValues.push(` ${operation} `);
+                    historyValues.push(` ${operation} `);
+                    this.setState({
+                        historyValues
+                    });
                     this.sendData();
 
                     return;
                 }
 
                 if (isEnteredNewValue || isResultPressed) {
-                    this.historyValues.push(parseFloat(this.getTextDisplay()));
-                    this.historyValues.push(` ${operation} `);
-                    this.sendData();
+                    historyValues.push(parseFloat(this.getTextDisplay()), ` ${operation} `);
+                    this.setState({
+                        historyValues
+                    });
+                    this.sendData()
 
                     return;
                 }
 
-                this.historyValues[this.historyValues.length - 1] = ` ${operation} `;
+                historyValues[historyValues.length - 1] = ` ${operation} `;
+                this.setState({
+                    historyValues
+                });
                 this.sendData();
 
                 break;
@@ -352,57 +352,48 @@ export default class Calculator extends Component {
             return;
         }
 
-        if (this.currentValue === null) {
-            this.currentValue = 0;
-            // this.isEnteredNewValue = true;
-            this.setState({ isEnteredNewValue: true });
+        if (this.state.currentValue === null) {
+            this.setState({
+                isEnteredNewValue: true,
+                currentValue: 0
+            });
         }
 
-        //this.isNeedValueForProgressive = true;
         this.setState({
             isNeedValueForProgressive: true,
             isNeedNewValueInDisplay: true
         });
-        //  this.isNeedNewValueInDisplay = true;
-        this.sendToHistoryDisplay(OPERATIONS.LABEL_DEFAULT_OPERATION, operation, this.currentValue, this.state.isPressedSingleOperation, this.state.isEnteredNewValue, this.state.isResultPressed);
+        this.sendToHistoryDisplay(OPERATIONS.LABEL_DEFAULT_OPERATION, operation, this.state.currentValue, this.state.isPressedSingleOperation, this.state.isEnteredNewValue, this.state.isResultPressed);
         this.setState({
             isResultPressed: false,
             isPressedSingleOperation: false
         });
-        //this.isResultPressed = false;
-        // this.isPressedSingleOperation = false;
 
         if (this.state.isOperationPressed) {
             if (this.state.isEnteredNewValue) {
                 if (this.state.isResultPressed) {
-                    this.currentValue = this.sendOperation(this.state.typeOperation, this.currentValue, this.state.valueForProgressive);
-                    this.sendResult(operation, this.currentValue);
+                    let result = this.sendOperation(this.state.typeOperation, this.state.currentValue, this.state.valueForProgressive);
+                    this.sendResult(operation, result);
                 } else {
-                    this.currentValue = this.sendOperation(this.state.typeOperation, this.currentValue, parseFloat(this.getTextDisplay()));
-                    this.sendResult(operation, this.currentValue);
+                    let result = this.sendOperation(this.state.typeOperation, this.state.currentValue, parseFloat(this.getTextDisplay()));
+                    this.sendResult(operation, result);
                 }
             }
 
-            //this.isEnteredNewValue = false;
             this.setState({
                 isEnteredNewValue: false,
                 typeOperation: operation
             });
-            // this.typeOperation = operation;
 
             return;
         }
 
-        this.currentValue = parseFloat(this.getTextDisplay());
-        // console.log(this.currentValue);
-        //  this.typeOperation = operation;
-        //  this.isOperationPressed = true;
         this.setState({
+            currentValue: parseFloat(this.getTextDisplay()),
             typeOperation: operation,
             isEnteredNewValue: false,
             isOperationPressed: true
         });
-        // this.isEnteredNewValue = false;
     };
 
     singleOperation = (operation) => {
@@ -410,12 +401,10 @@ export default class Calculator extends Component {
             return;
         }
 
-        // this.isNeedNewValueInDisplay = true;
         this.setState({ isNeedNewValueInDisplay: true });
         // eslint-disable-next-line
         this.sendToHistoryDisplay(OPERATIONS.LABEL_SINGLE_OPERATION, operation, result, this.state.isPressedSingleOperation);
         this.setState({ isPressedSingleOperation: true });
-        // this.isPressedSingleOperation = true;
 
         if (this.currentValue === null) {
             this.currentValue = parseFloat(this.getTextDisplay());
@@ -431,12 +420,10 @@ export default class Calculator extends Component {
         }
 
         this.SDclear();
-        //this.isResultPressed = true;
         this.setState({ isResultPressed: true });
 
-
         if (this.state.isEnteredNewValue && !this.state.isOperationPressed) {
-            this.currentValue = parseFloat(this.getTextDisplay());
+            this.setState({ currentValue: parseFloat(this.getTextDisplay()) });
         }
 
         this.setState({
@@ -444,25 +431,20 @@ export default class Calculator extends Component {
             isOperationPressed: false,
             isPressedSingleOperation: false
         });
-        // this.isEnteredNewValue = false;
-        //   this.isPressedSingleOperation = false;
-        //   this.isOperationPressed = false;
 
-        if (this.state.isNeedValueForProgressive) {
-            // this.valueForProgressive = parseFloat(this.getTextDisplay());
-            console.log('+');
-            this.setState({
-                valueForProgressive: parseFloat(this.getTextDisplay()),
-                isNeedValueForProgressive: false
-            });
-            // this.isNeedValueForProgressive = false;
-        }
+        if (this.state.currentValue !== null) {
+            if (this.state.isNeedValueForProgressive) {
+                this.setState({
+                    valueForProgressive: parseFloat(this.getTextDisplay()),
+                    isNeedValueForProgressive: false
+                });
 
-        if (this.currentValue !== null) {
-              console.log(this.currentValue, this.state.valueForProgressive);
-            let result = this.sendOperation(this.state.typeOperation, this.currentValue, this.state.valueForProgressive);
-            this.sendResult(this.state.typeOperation, result);
-
+                let result = this.sendOperation(this.state.typeOperation, this.state.currentValue, parseFloat(this.getTextDisplay()));
+                this.sendResult(this.state.typeOperation, result);
+            } else {
+                let result = this.sendOperation(this.state.typeOperation, this.state.currentValue, this.state.valueForProgressive);
+                this.sendResult(this.state.typeOperation, result);
+            }
         }
     }
 
@@ -586,7 +568,6 @@ export default class Calculator extends Component {
                 displayValue: '0.',
                 isNeedNewValueInDisplay: false
             });
-            //this.isNeedNewValueInDisplay = false;
 
             return;
         }
@@ -601,13 +582,10 @@ export default class Calculator extends Component {
             return;
         }
 
-        //this.typeOperation = null;
-
         this.setState({
             typeOperation: null,
             isDisabledOperations: false
         });
-        // this.operationsDisabled = false;
 
         if (this.getTextDisplay().indexOf('e') !== -1 || this.state.isPressedSingleOperation) {
             return;
@@ -642,21 +620,16 @@ export default class Calculator extends Component {
         }
 
         this.setState({ valueForProgressive: this.sendOperation(OPERATIONS.NEGATE, this.getTextDisplay()) });
-        //this.valueForProgressive = this.sendOperation(OPERATIONS.NEGATE, this.getTextDisplay());
 
         if (this.getTextDisplay() === '0' || this.state.isResultPressed) {
             this.setState({
                 isEnteredNewValue: true,
                 isNeedNewValueInDisplay: true
             });
-            //this.isEnteredNewValue = true;
-            //  this.isNeedNewValueInDisplay = true;
             this.sendToHistoryDisplay(OPERATIONS.LABEL_SINGLE_OPERATION, OPERATIONS.NEGATE, this.state.valueForProgressive, this.state.isPressedSingleOperation);
         }
 
         this.setState({ isPressedSingleOperation: true });
-
-        //this.isPressedSingleOperation = true;
 
         if (this.getTextDisplay() === '0') {
             return;
@@ -672,19 +645,17 @@ export default class Calculator extends Component {
     }
 
     percent = () => {
-        if (this.state.isDisabledOperations || this.currentValue === null) {
+        if (this.state.isDisabledOperations || this.state.currentValue === null) {
             return;
         }
 
-        let result = this.sendOperation(OPERATIONS.PERCENT, this.currentValue, parseFloat(this.getTextDisplay()));
+        let result = this.sendOperation(OPERATIONS.PERCENT, this.state.currentValue, parseFloat(this.getTextDisplay()));
         this.sendResult(OPERATIONS.PERCENT, result);
         this.sendToHistoryDisplay(OPERATIONS.PERCENT, OPERATIONS.PERCENT, this.trimmer(result), this.state.isPressedSingleOperation);
         this.setState({
             isPressedSingleOperation: true,
             isNeedNewValueInDisplay: true
         });
-        // this.isPressedSingleOperation = true;
-        //this.isNeedNewValueInDisplay = true;
     }
 
     toggleVisualStateButtons = () => {
@@ -696,64 +667,75 @@ export default class Calculator extends Component {
         });
     }
 
-    manage = (mode) => {
+    get classNames() {
+        const { mode } = this.state;
+        const classNames = ['calculator'];
+
         switch (mode) {
             case CALC_MODES.STANDART: {
-                this.styleSettings.visible = 'block';
-                this.styleSettings.calculatorHeight = '540px';
+                classNames.push('standart');
 
-                break;
+                return {
+                    calcBody: 'calculator-body displayBlock',
+                    calc: classNames.join(' '),
+                    button: 'open-calculator'
+                }
             }
             case CALC_MODES.MINIMIZED: {
-                this.styleSettings.visible = 'none';
-                this.styleSettings.calculatorHeight = '32px';
-                this.styleSettings.calculatorBottom = 'auto';
+                classNames.push('minimized');
 
-                break;
+                return {
+                    calcBody: 'calculator-body closed',
+                    calc: classNames.join(' '),
+                    button: 'open-calculator'
+                }
             }
             case CALC_MODES.CLOSED: {
-                this.styleSettings.openCalcDisplay = 'block';
-                this.styleSettings.calculatorDisplay = 'none';
+                classNames.push('closed');
 
-                break;
+                return {
+                    calcBody: 'calculator-body',
+                    calc: classNames.join(' '),
+                    button: 'open-calculator displayBlock'
+                }
             }
             case CALC_MODES.DEFAULT: {
-                this.styleSettings.openCalcDisplay = 'none';
-                this.styleSettings.visible = 'block';
-                this.styleSettings.calculatorHeight = '540px';
-                this.styleSettings.calculatorDisplay = 'block';
+                classNames.push('standart');
                 this.coords.x = `${(window.innerWidth - 320) / window.innerWidth * 100}%`;
                 this.coords.y = `${(window.innerHeight - 540) / window.innerHeight * 100}%`;
 
-                break;
+                return {
+                    calcBody: 'calculator-body displayBlock',
+                    calc: classNames.join(' '),
+                    button: 'open-calculator'
+                }
             }
             default: {
-                console.log(MESSAGES.ERROR.MODES);
-
-                break;
+               return console.log(MESSAGES.ERROR.MODES);
             }
         }
     }
 
     buttonTrey = () => {
         this.setState({ mode: CALC_MODES.MINIMIZED });
-        this.manage(CALC_MODES.MINIMIZED);
         this.localStorage.dataset = {
-            mode: CALC_MODES.MINIMIZED
+            mode: CALC_MODES.MINIMIZED,
+            x: this.coords.x,
+            y: this.coords.y
         }
     };
 
     buttonOpen = () => {
         this.setState({ mode: CALC_MODES.STANDART });
-        this.manage(CALC_MODES.STANDART);
         this.localStorage.dataset = {
-            mode: CALC_MODES.STANDART
+            mode: CALC_MODES.STANDART,
+            x: this.coords.x,
+            y: this.coords.y
         }
     };
 
     buttonClose = () => {
         this.setState({ mode: CALC_MODES.CLOSED });
-        this.manage(CALC_MODES.CLOSED);
         this.localStorage.dataset = {
             mode: CALC_MODES.CLOSED
         }
@@ -761,7 +743,6 @@ export default class Calculator extends Component {
 
     buttonOpenCalculator = () => {
         this.setState({ mode: CALC_MODES.DEFAULT });
-        this.manage(CALC_MODES.DEFAULT);
         this.localStorage.dataset = {
             mode: CALC_MODES.DEFAULT
         }
@@ -809,7 +790,6 @@ export default class Calculator extends Component {
         }
 
         this.setState({ isNeedNewValueInDisplay: true });
-        //this.isNeedNewValueInDisplay = true;
 
         if (this.state.isDisabledMemoryButtons) {
             this.setState({ isDisabledMemoryButtons: false });
@@ -870,7 +850,6 @@ export default class Calculator extends Component {
             displayValue: memoryValues[position].data,
             isEnteredNewValue: true
         });
-        // this.isEnteredNewValue = true;
     }
 
     memoryPlus = () => {
@@ -1063,19 +1042,15 @@ export default class Calculator extends Component {
             <React.Fragment>
                 <div
                     onClick={this.buttonOpenCalculator}
-                    style={{ 'display': this.styleSettings.openCalcDisplay }}
-                    className="open-calculator"
+                    className={this.classNames.button}
                 >Open calc</div>
                 <div
                     ref={this.$calculator}
                     onDragStart={this.calculatorDragStart}
-                    className="calculator"
+                    className={this.classNames.calc}
                     style={{
                         left: this.coords.x,
-                        top: this.coords.y,
-                        height: this.styleSettings.calculatorHeight,
-                        bottom: this.styleSettings.calculatorBottom,
-                        display: this.styleSettings.calculatorDisplay
+                        top: this.coords.y
                     }}>
                     <div className="index-menu">
                         <p onMouseDown={this.calculatorDragAndDrop} className="index-menu__title">Калькулятор</p>
@@ -1083,7 +1058,7 @@ export default class Calculator extends Component {
                         <div onClick={this.buttonOpen} className="index-menu__button index-menu__button_open">☐</div>
                         <div onClick={this.buttonClose} className="index-menu__button index-menu__button_close">✕</div>
                     </div>
-                    <div ref={this.$calculatorBody} style={{ display: this.styleSettings.visible }} className="calculator-body">
+                    <div ref={this.$calculatorBody} className={this.classNames.calcBody}>
                         <div className="option-menu">
                             <div className="option-menu__btn-menu">☰</div>
                             <p className="option-menu__title">Обычный</p>
