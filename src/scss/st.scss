@@ -295,7 +295,7 @@ body, html {
 }
 .memory {
 	position: absolute;
-	top: 30px;
+	top: 32px;
 	bottom: 0;
 	left: 0;
 	right: 0;
@@ -324,7 +324,7 @@ body, html {
 	&__block {
 		height: 67px;
 		font-size: 25px;
-		padding: 10px 20px 5px 20px;
+		padding: 10px 20px 10px 20px;
 		text-align: right;
 		&:hover {
 			background: #dbdbdb;

@@ -6,6 +6,7 @@ export default class Button extends Component {
     static propTypes = {
         isOpenMemoryWindow: PropTypes.bool,
         isDisabledMemoryButtons: PropTypes.bool,
+        isDisabledMemoryButtonsAll: PropTypes.bool,
         btnSettings: PropTypes.object,
         isDisabled: PropTypes.bool,
         memoryClear: PropTypes.func,
@@ -27,6 +28,7 @@ export default class Button extends Component {
         isDisabledMemoryButtons: false,
         btnSettings: {},
         isDisabled: false,
+        isDisabledMemoryButtonsAll: false,
         memoryClear: () => {},
         memoryRead: () => {},
         memoryPlus: () => {},
@@ -140,10 +142,14 @@ export default class Button extends Component {
     }
 
     get className() {
-        const { isDisabled, isDisabledMemoryButtons, isOpenMemoryWindow } = this.props;
+        const { isDisabled, isDisabledMemoryButtons, isOpenMemoryWindow, isDisabledMemoryButtonsAll } = this.props;
         const { style } = this.props.btnSettings;
         const classNames = [style];
 
+        if (isDisabledMemoryButtonsAll) { 
+            classNames.push('calc-add__button_disabled');
+        }
+        
         if (isDisabledMemoryButtons) {
             classNames.push('calc-add__button_disabled');
         }
@@ -160,7 +166,7 @@ export default class Button extends Component {
     }
 
     render() {        
-        let { dataAttribute } = this.props.btnSettings;
+        const { dataAttribute } = this.props.btnSettings;
 
         return (
             <div

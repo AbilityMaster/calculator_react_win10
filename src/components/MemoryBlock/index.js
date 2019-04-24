@@ -66,6 +66,7 @@ export default class MemoryBlock extends Component {
             btnMinus: "memory__btn memory__btn_m_minus"
         }
     }
+    
 
     render() {
         const { memory } = this.props;

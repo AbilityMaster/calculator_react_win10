@@ -18,18 +18,21 @@ export default class HistoryDisplay extends Component {
 
     componentDidUpdate() {
         if (this.$smallDisplay.current && this.$smallDisplay.current.scrollWidth > 300) {
-            let width = this.$smallDisplay.current.scrollWidth;
+            const width = this.$smallDisplay.current.scrollWidth;
+
             this.$smallDisplay.current.scrollTo(width, 0);
         }
     }
 
     btnMoveLeft = () => {
-        let width = this.$smallDisplay.current.scrollWidth;
+        const width = this.$smallDisplay.current.scrollWidth;
+
         this.$smallDisplay.current.scrollTo(0, width);
     }
 
     btnMoveRight = () => {
-        let width = this.$smallDisplay.current.scrollWidth;
+        const width = this.$smallDisplay.current.scrollWidth;
+
         this.$smallDisplay.current.scrollTo(width, 0);
     }
 
@@ -62,7 +65,7 @@ export default class HistoryDisplay extends Component {
         const { displayHistoryValue } = this.props;
 
         return (
-            <div className="group-small-display js-group-small-display">
+            <div className="group-small-display">
                 {this.renderLeftButton()}
                 <div ref={this.$smallDisplay} className="small-display">{displayHistoryValue}</div>
                 {this.renderRightButton()}
