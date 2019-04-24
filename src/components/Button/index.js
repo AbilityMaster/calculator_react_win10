@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import { OPERATIONS, MESSAGES } from '../../const';
 import PropTypes from 'prop-types';
+import { OPERATIONS, MESSAGES } from '../../const';
 
 export default class Button extends Component {
     static propTypes = {

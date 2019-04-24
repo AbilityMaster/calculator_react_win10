@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import { MAX_WIDTH_DISPLAY } from '../../const';
 import PropTypes from 'prop-types';
+import { MAX_WIDTH_DISPLAY } from '../../const';
 
 export default class HistoryDisplay extends Component {
     static propTypes = {

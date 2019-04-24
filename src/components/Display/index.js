@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import { STYLES } from '../../const';
 import PropTypes from 'prop-types';
+import { STYLES } from '../../const';
 
 export default class Display extends Component {
     static propTypes = {

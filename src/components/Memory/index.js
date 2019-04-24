@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import MemoryBlock from '../MemoryBlock';
 import PropTypes from 'prop-types';
+import MemoryBlock from '../MemoryBlock';
 
 export default class Memory extends Component {
     static propTypes = {
