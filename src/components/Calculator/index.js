@@ -981,13 +981,71 @@ export default class Calculator extends Component {
     }
 
     get classNames() {
+        const { isDisabled, isDisabledMemoryButtons, isOpenMemoryWindow, isDisabledMemoryButtonsAll } = this.state;
+
+        let button = {
+            buttonsCanBeDisabled: {
+                default: ['calculator__button'],
+                pow: ['calculator__button calculator__button_pow'],
+                frac: ['calculator__button calculator__button_frac']
+            },
+            memoryButtonsDefaultDisabled: {
+                mClear: ['calculator__memory-button'],
+                mRead: ['calculator__memory-button'],
+                mOpen: ['calculator__memory-button']
+            },
+            memoryButtonsDefaultUnDisabled: {
+                mPlus: ['calculator__memory-button'],
+                mMinus: ['calculator__memory-button'],
+                mSave: ['calculator__memory-button']
+            }
+        }
+
+        if (isDisabled) {
+            button.buttonsCanBeDisabled.default.push('calculator__button_disabled');
+            button.buttonsCanBeDisabled.pow.push('calculator__button_disabled');
+            button.buttonsCanBeDisabled.frac.push('calculator__button_disabled');
+        }
+        if (isDisabledMemoryButtons) {
+            button.memoryButtonsDefaultDisabled.mClear.push('calculator__memory-button_disabled');
+            button.memoryButtonsDefaultDisabled.mRead.push('calculator__memory-button_disabled');
+            button.memoryButtonsDefaultDisabled.mOpen.push('calculator__memory-button_disabled');
+        }
+        if (isDisabledMemoryButtonsAll) {
+            button.memoryButtonsDefaultDisabled.mClear.push('calculator__memory-button_disabled');
+            button.memoryButtonsDefaultDisabled.mRead.push('calculator__memory-button_disabled');
+            button.memoryButtonsDefaultDisabled.mOpen.push('calculator__memory-button_disabled');
+            button.memoryButtonsDefaultUnDisabled.mPlus.push('calculator__memory-button_disabled');
+            button.memoryButtonsDefaultUnDisabled.mMinus.push('calculator__memory-button_disabled');
+            button.memoryButtonsDefaultUnDisabled.mSave.push('calculator__memory-button_disabled');
+        }
+        if (isOpenMemoryWindow) {
+            button.memoryButtonsDefaultDisabled.mClear.push('calculator__memory-button_disabled');
+            button.memoryButtonsDefaultDisabled.mRead.push('calculator__memory-button_disabled');
+            button.memoryButtonsDefaultUnDisabled.mPlus.push('calculator__memory-button_disabled');
+            button.memoryButtonsDefaultUnDisabled.mMinus.push('calculator__memory-button_disabled');            
+            button.memoryButtonsDefaultUnDisabled.mSave.push('calculator__memory-button_disabled');
+        }
+
         return {
-            memoryButton: 'calculator__memory-button',
-            defaultButton: 'calculator__button',
-            powButton: 'calculator__button calculator__button_pow',
-            fracButton: 'calculator__button calculator__button_frac',
+            buttonsCanBeDisabled: {
+                default: button.buttonsCanBeDisabled.default.join(' '),
+                pow: button.buttonsCanBeDisabled.pow.join(' '),
+                frac: button.buttonsCanBeDisabled.frac.join(' '),
+            },
+            memoryButtonsDefaultDisabled: {
+                mClear: button.memoryButtonsDefaultDisabled.mClear.join(' '),
+                mRead: button.memoryButtonsDefaultDisabled.mRead.join(' '),
+                mOpen: button.memoryButtonsDefaultDisabled.mOpen.join(' '),
+            },
+            memoryButtonsDefaultUnDisabled: {
+                mPlus: button.memoryButtonsDefaultUnDisabled.mPlus.join(' '),
+                mMinus:  button.memoryButtonsDefaultUnDisabled.mPlus.join(' '),
+                mSave:  button.memoryButtonsDefaultUnDisabled.mPlus.join(' '),
+            },
+            numberButton: 'calculator__button calculator__button_number',
             ceButton: 'calculator__button calculator__button_disabled',
-            numberButton: 'calculator__button calculator__button_number'
+            default: 'calculator__button'
         }
     }
 
@@ -1000,7 +1058,7 @@ export default class Calculator extends Component {
     }
 
     render() {
-        const { memoryValues, displayValue, isOpenMemoryWindow, isDisabled, displayHistoryValue, displayFontSize, isDisabledMemoryButtons, isDisabledMemoryButtonsAll } = this.state;
+        const { memoryValues, displayValue, isOpenMemoryWindow, displayHistoryValue, displayFontSize } = this.state;
 
         return (
             <React.Fragment>
@@ -1037,67 +1095,49 @@ export default class Calculator extends Component {
                         <div className='calculator__button-area'>
                             <div className='calculator__row'>
                                 <Button
-                                    isDisabledMemoryButtonsAll={isDisabledMemoryButtonsAll}
-                                    isOpenMemoryWindow={isOpenMemoryWindow}
-                                    isDisabledMemoryButtons={isDisabledMemoryButtons}
-                                    classes={this.classNames.memoryButton}
+                                    classes={this.classNames.memoryButtonsDefaultDisabled.mClear}
                                     onClick={this.memoryClear}
                                 >MC</Button>
                                 <Button
-                                    isDisabledMemoryButtonsAll={isDisabledMemoryButtonsAll}
-                                    isOpenMemoryWindow={isOpenMemoryWindow}
                                     onClick={this.memoryRead}
-                                    isDisabledMemoryButtons={isDisabledMemoryButtons}
-                                    classes={this.classNames.memoryButton}
+                                    classes={this.classNames.memoryButtonsDefaultDisabled.mRead}
                                 >MR</Button>
                                 <Button
-                                    isDisabledMemoryButtonsAll={isDisabledMemoryButtonsAll}
-                                    isOpenMemoryWindow={isOpenMemoryWindow}
                                     onClick={this.memoryPlus}
-                                    classes={this.classNames.memoryButton}
+                                    classes={this.classNames.memoryButtonsDefaultUnDisabled.mPlus}
                                 >M<span>+</span></Button>
                                 <Button
-                                    isDisabledMemoryButtonsAll={isDisabledMemoryButtonsAll}
-                                    isOpenMemoryWindow={isOpenMemoryWindow}
                                     onClick={this.memoryMinus}
-                                    classes={this.classNames.memoryButton}
+                                    classes={this.classNames.memoryButtonsDefaultUnDisabled.mMinus}
                                 >M<span>-</span></Button>
                                 <Button
-                                    isDisabledMemoryButtonsAll={isDisabledMemoryButtonsAll}
-                                    isOpenMemoryWindow={isOpenMemoryWindow}
                                     onClick={this.memorySave}
-                                    classes={this.classNames.memoryButton}
+                                    classes={this.classNames.memoryButtonsDefaultUnDisabled.mSave}
                                 >MS</Button>
                                 <Button
-                                    isDisabledMemoryButtonsAll={isDisabledMemoryButtonsAll}
-                                    isDisabledMemoryButtons={isDisabledMemoryButtons}
                                     onClick={this.memoryOpen}
-                                    classes={this.classNames.memoryButton}
+                                    classes={this.classNames.memoryButtonsDefaultDisabled.mOpen}
                                 >M</Button>
                             </div>
                             <div className='calculator__row'>
                                 <Button
-                                    isDisabled={isDisabled}
                                     onClick={this.percent}
-                                    classes={this.classNames.defaultButton}
+                                    classes={this.classNames.buttonsCanBeDisabled.default}
                                 >%</Button>
                                 <Button
-                                    isDisabled={isDisabled}
-                                    classes={this.classNames.defaultButton}
+                                    classes={this.classNames.buttonsCanBeDisabled.default}
                                     onClick={this.singleOperation}
                                     dataAttributes={this.dataAttributes.sqrt}
                                 >√</Button>
                                 <Button
-                                    isDisabled={isDisabled}
-                                    classes={this.classNames.powButton}
+                                    classes={this.classNames.buttonsCanBeDisabled.pow}
                                     onClick={this.singleOperation}
                                     dataAttributes={this.dataAttributes.pow}
                                 >
                                     <span className='span'>x</span>
                                 </Button>
                                 <Button
-                                    isDisabled={isDisabled}
-                                    classes={this.classNames.fracButton}
+                                    classes={this.classNames.buttonsCanBeDisabled.frac}
                                     onClick={this.singleOperation}
                                     dataAttributes={this.dataAttributes.frac}
                                 >
@@ -1107,16 +1147,15 @@ export default class Calculator extends Component {
                             <div className='calculator__row'>
                                 <Button classes={this.classNames.ceButton}>CE</Button>
                                 <Button
-                                    classes={this.classNames.defaultButton}
+                                    classes={this.classNames.default}
                                     onClick={this.clear}
                                 >C</Button>
                                 <Button
-                                    classes={this.classNames.defaultButton}
+                                    classes={this.classNames.default}
                                     onClick={this.backspace}
                                 >{`<-`}</Button>
                                 <Button
-                                    isDisabled={isDisabled}
-                                    classes={this.classNames.defaultButton}
+                                    classes={this.classNames.buttonsCanBeDisabled.default}
                                     onClick={this.operation}
                                 >÷</Button>
                             </div>
@@ -1134,8 +1173,7 @@ export default class Calculator extends Component {
                                     onClick={this.handleChangeValue}
                                 >9</Button>
                                 <Button
-                                    isDisabled={isDisabled}
-                                    classes={this.classNames.defaultButton}
+                                    classes={this.classNames.buttonsCanBeDisabled.default}
                                     onClick={this.operation}>*</Button>
                             </div>
                             <div className='calculator__row'>
@@ -1151,8 +1189,8 @@ export default class Calculator extends Component {
                                     classes={this.classNames.numberButton}
                                     onClick={this.handleChangeValue}
                                 >6</Button>
-                                <Button
-                                    isDisabled={isDisabled} classes={this.classNames.defaultButton}
+                                <Button 
+                                    classes={this.classNames.buttonsCanBeDisabled.default}
                                     onClick={this.operation}
                                 >-</Button>
                             </div>
@@ -1170,29 +1208,25 @@ export default class Calculator extends Component {
                                     onClick={this.handleChangeValue}
                                 >3</Button>
                                 <Button
-                                    isDisabled={isDisabled}
-                                    classes={this.classNames.defaultButton}
+                                    classes={this.classNames.buttonsCanBeDisabled.default}
                                     onClick={this.operation}
                                 >+</Button>
                             </div>
                             <div className='calculator__row'>
                                 <Button
-                                    isDisabled={isDisabled}
                                     onClick={this.reverse}
-                                    classes={this.classNames.defaultButton}
+                                    classes={this.classNames.buttonsCanBeDisabled.default}
                                 >±</Button>
                                 <Button
                                     classes={this.classNames.numberButton}
                                     onClick={this.handleChangeValue}
                                 >0</Button>
                                 <Button
-                                    isDisabled={isDisabled}
                                     onClick={this.addPoint}
-                                    classes={this.classNames.defaultButton}>,</Button>
+                                    classes={this.classNames.buttonsCanBeDisabled.default}>,</Button>
                                 <Button
-                                    isDisabled={isDisabled}
                                     onClick={this.result}
-                                    classes={this.classNames.defaultButton}
+                                    classes={this.classNames.buttonsCanBeDisabled.default}
                                 >=</Button>
                             </div>
                             <Memory
