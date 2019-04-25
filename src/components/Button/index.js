@@ -13,7 +13,7 @@ export default class Button extends Component {
 
     render() {   
         const { dataAttributes, onClick, classes } = this.props;
-
+        
         return (
             <div
                 onClick={onClick}
