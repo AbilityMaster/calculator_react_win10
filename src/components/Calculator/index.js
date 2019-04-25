@@ -74,6 +74,7 @@ export default class Calculator extends Component {
             isOperationPressed: false,
             isNeedValueForProgressive: false,
             isNeedNewValueInDisplay: false,
+            isDisabledMemoryButtons: true,
             valueForProgressive: null,
             currentValue: null,
             typeOperation: null,
@@ -146,13 +147,19 @@ export default class Calculator extends Component {
         if (isDisabledOperations) {
             this.clear();
             this.toggleVisualStateButtons();
-            this.setState({ displayFontSize: STYLES.NORMAL });
+            this.setState({
+                displayFontSize: STYLES.NORMAL,
+                isDisabledMemoryButtons: true,
+            });
         }
 
         this.updateSmallDisplay();
         this.setState({
+            clearButtons: true,
             isEnteredNewValue: true,
             isPressedSingleOperation: false
+        }, () => {
+            this.setState({ clearButtons: false });
         });
 
         if ((displayValue === '0' || (isNeedNewValueInDisplay) || (isResultPressed && displayValue !== '0.') || displayValue === MESSAGES.DIVIDE_BY_ZERO)) {
@@ -478,7 +485,7 @@ export default class Calculator extends Component {
             } else {
                 if (isEnteredNewValue && !isOperationPressed) {
                     result = this.sendOperation(typeOperation, parseFloat(this.getTextDisplay()), valueForProgressive);
-                } else {                    
+                } else {
                     result = this.sendOperation(typeOperation, currentValue, valueForProgressive);
                 }
                 this.sendResult(typeOperation, result);
@@ -1027,7 +1034,7 @@ export default class Calculator extends Component {
             button.memoryButtonsDefaultDisabled.mClear.push('calculator__memory-button_disabled');
             button.memoryButtonsDefaultDisabled.mRead.push('calculator__memory-button_disabled');
             button.memoryButtonsDefaultUnDisabled.mPlus.push('calculator__memory-button_disabled');
-            button.memoryButtonsDefaultUnDisabled.mMinus.push('calculator__memory-button_disabled');            
+            button.memoryButtonsDefaultUnDisabled.mMinus.push('calculator__memory-button_disabled');
             button.memoryButtonsDefaultUnDisabled.mSave.push('calculator__memory-button_disabled');
         }
 
@@ -1044,8 +1051,8 @@ export default class Calculator extends Component {
             },
             memoryButtonsDefaultUnDisabled: {
                 mPlus: button.memoryButtonsDefaultUnDisabled.mPlus.join(' '),
-                mMinus:  button.memoryButtonsDefaultUnDisabled.mPlus.join(' '),
-                mSave:  button.memoryButtonsDefaultUnDisabled.mPlus.join(' '),
+                mMinus: button.memoryButtonsDefaultUnDisabled.mPlus.join(' '),
+                mSave: button.memoryButtonsDefaultUnDisabled.mPlus.join(' '),
             },
             numberButton: 'calculator__button calculator__button_number',
             ceButton: 'calculator__button calculator__button_disabled',
@@ -1194,7 +1201,7 @@ export default class Calculator extends Component {
                                     className={this.classNames.numberButton}
                                     onClick={this.handleChangeValue}
                                 >6</Button>
-                                <Button 
+                                <Button
                                     className={this.classNames.buttonsCanBeDisabled.default}
                                     onClick={this.operation}
                                 >-</Button>

@@ -74,9 +74,9 @@ export default class MemoryBlock extends Component {
         return (
             <div onMouseOver={this.handleMouseOver} onMouseOut={this.handleMouseOut} className="calculator__memory-item" data-position={memory.position}>
                 <div className="calculator__memory-data">{memory.data}</div>
-                <Button onClick={this.clear} classes={this.classNames.btnMC}>MC</Button>
-                <Button onClick={this.plus}  classes={this.classNames.btnMPlus}>M+</Button>
-                <Button onClick={this.minus} classes={this.classNames.btnMinus}>M-</Button>              
+                <Button onClick={this.clear} className={this.classNames.btnMC}>MC</Button>
+                <Button onClick={this.plus}  className={this.classNames.btnMPlus}>M+</Button>
+                <Button onClick={this.minus} className={this.classNames.btnMinus}>M-</Button>              
             </div>
         )
     }
