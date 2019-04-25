@@ -16,6 +16,7 @@ class LocalStorage {
 					temp[key] = obj[key];
 				}
 			}
+
 			for (let key in obj) {
 				if (!obj.hasOwnProperty(key)) {
 					continue;
@@ -25,15 +26,17 @@ class LocalStorage {
 					temp[key] = obj[key];
 				}
 			}
+			
 			localStorage.setItem(this.key, JSON.stringify(temp));
 			
 			return;
 		} 
+
 		localStorage.setItem(this.key, JSON.stringify(obj));
 	}
 	
 	get isEmpty() {
-		return (this.dataset === null)
+		return this.dataset === null
 	}
 
 	get dataset() {

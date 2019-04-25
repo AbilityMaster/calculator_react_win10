@@ -7,24 +7,24 @@ export default class Memory extends Component {
         clearItemFromMemoryBoard: PropTypes.func,
         updateLocalStorage: PropTypes.func,
         displayValue: PropTypes.string,
-        isOpenMemoryWindow: PropTypes.bool,
-        memoryValues: PropTypes.array
+        isOpen: PropTypes.bool,
+        values: PropTypes.array
     }
 
     static defailtProps = {
         clearItemFromMemoryBoard: () => { },
         updateLocalStorage: () => { },
         displayValue: '',
-        isOpenMemoryWindow: false,
-        memoryValues: []
+        isOpen: false,
+        values: []
     }
 
     get classNames() {
-        const { isOpenMemoryWindow } = this.props;
-        const classNames = ['memory'];
+        const { isOpen } = this.props;
+        const classNames = ['calculator__memory-board'];
 
-        if (isOpenMemoryWindow) {
-            classNames.push('visibility');
+        if (isOpen) {
+            classNames.push('calculator__memory-board_visible');
 
             return classNames.join(' ');
         }
@@ -33,9 +33,9 @@ export default class Memory extends Component {
     }
 
     renderMemoryItems() {
-        const { memoryValues, displayValue, updateLocalStorage, onClearMemoryItem } = this.props;
+        const { values, displayValue, updateLocalStorage, onClearMemoryItem } = this.props;
 
-        const memoryElements = memoryValues.map((memory) =>
+        const memoryElements = values.map((memory) =>
             <MemoryBlock
                 onClearMemoryItem={onClearMemoryItem}
                 updateLocalStorage={updateLocalStorage}

@@ -42,7 +42,7 @@ export default class HistoryDisplay extends Component {
                 <div
                     onClick={this.btnMoveLeft}
                     ref={this.$buttonMoveLeft}
-                    className="small-display__button small-display__button_left visibility"
+                    className="calculator__history-button calculator__history-button_move-left visibility"
                 />
             )
         }
@@ -55,7 +55,7 @@ export default class HistoryDisplay extends Component {
                 <div
                     onClick={this.btnMoveRight}
                     ref={this.$buttonMoveLeft}
-                    className="small-display__button small-display__button_right visibility" />
+                    className="calculator__history-button calculator__history-button_move-right visibility" />
             )
         }
         return null;
@@ -65,9 +65,9 @@ export default class HistoryDisplay extends Component {
         const { displayHistoryValue } = this.props;
 
         return (
-            <div className="group-small-display">
+            <div className="calculator__history">
                 {this.renderLeftButton()}
-                <div ref={this.$smallDisplay} className="small-display">{displayHistoryValue}</div>
+                <div ref={this.$smallDisplay} className="calculator__history-display">{displayHistoryValue}</div>
                 {this.renderRightButton()}
             </div>
         )
