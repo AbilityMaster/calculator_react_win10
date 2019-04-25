@@ -659,7 +659,7 @@ export default class Calculator extends Component {
         }
 
         this.setState((state) => ({
-            displayValue: state.displayValue.slice(0, state.displayValue.length - 1)
+            displayValue: this.getTextDisplay().slice(0, this.getTextDisplay().length - 1)
         }));
     };
 
