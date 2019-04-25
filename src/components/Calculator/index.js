@@ -627,7 +627,7 @@ export default class Calculator extends Component {
     backspace = () => {
         const { isDisabledOperations, isResultPressed, isOperationPressed, isPressedSingleOperation, displayValue } = this.state;
 
-        if ((!isDisabledOperations && isResultPressed) || isOperationPressed) {
+        if ((!isDisabledOperations && isResultPressed) || isOperationPressed || isDisabledOperations) {
             return;
         }
 

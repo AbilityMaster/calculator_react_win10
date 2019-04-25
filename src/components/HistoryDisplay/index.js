@@ -24,7 +24,6 @@ export default class HistoryDisplay extends Component {
     componentDidUpdate() {
         if (this.$smallDisplay.current && this.$smallDisplay.current.scrollWidth > MAX_WIDTH_DISPLAY) {
             const width = this.$smallDisplay.current.scrollWidth;
-
             this.$smallDisplay.current.scrollTo(width, 0);
         }
     }
