@@ -1242,6 +1242,7 @@ export default class Calculator extends Component {
                                 >=</Button>
                             </div>
                             <Memory
+                                getTextDisplay={this.getTextDisplay}
                                 onClearMemoryItem={this.onClearMemoryItem}
                                 updateLocalStorage={this.updateLocalStorage}
                                 displayValue={displayValue}

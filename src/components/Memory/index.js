@@ -33,10 +33,11 @@ export default class Memory extends Component {
     }
 
     renderMemoryItems() {
-        const { values, displayValue, updateLocalStorage, onClearMemoryItem } = this.props;
+        const { values, displayValue, updateLocalStorage, onClearMemoryItem, getTextDisplay } = this.props;
 
         const memoryElements = values.map((memory) =>
             <MemoryBlock
+                getTextDisplay={getTextDisplay}
                 onClearMemoryItem={onClearMemoryItem}
                 updateLocalStorage={updateLocalStorage}
                 displayValue={displayValue}

@@ -32,17 +32,17 @@ export default class MemoryBlock extends Component {
     }
 
     plus = () => {
-        const { updateLocalStorage, displayValue, memory } = this.props;
+        const { updateLocalStorage, memory, getTextDisplay } = this.props;
 
-        memory.data = parseFloat(memory.data) + parseFloat(displayValue);
+        memory.data = parseFloat(memory.data) + parseFloat(getTextDisplay());
         updateLocalStorage(memory);
         this.setState({ memoryData: memory.data});        
     }
 
     minus = () => {
-        const { updateLocalStorage, displayValue, memory } = this.props;
+        const { updateLocalStorage, memory, getTextDisplay} = this.props;
 
-        memory.data = parseFloat(memory.data) - parseFloat(displayValue);
+        memory.data = parseFloat(memory.data) - parseFloat(getTextDisplay());
         updateLocalStorage(memory);
         this.setState({ memoryData: memory.data});    
     }
