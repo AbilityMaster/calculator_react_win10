@@ -269,7 +269,7 @@ export default class Calculator extends Component {
     }
 
     trimmer = (temp) => {
-        if ((String(temp).indexOf('.') !== -1 && temp > 1) || (temp < 1 && String(temp).length > MAX_LENGTH_DISPLAY)) {
+        if (((String(temp).indexOf('.') !== -1 && temp > 1) || (temp < 1 && String(temp).length > MAX_LENGTH_DISPLAY)) && String(temp).indexOf('e') === -1) {
             temp = temp.toPrecision(6);
         }
 
@@ -291,7 +291,7 @@ export default class Calculator extends Component {
 
         if ((operation !== OPERATIONS.PERCENT) && (operation !== OPERATIONS.POW) &&
             (operation !== OPERATIONS.FRAC) && (operation !== OPERATIONS.SQRT)) {
-            this.setState({ currentValue: this.trimmer(result) });
+            this.setState({ currentValue: parseFloat(this.trimmer(result)) });
         }
     };
 
@@ -482,14 +482,18 @@ export default class Calculator extends Component {
 
                 result = this.sendOperation(typeOperation, currentValue, parseFloat(this.getTextDisplay()));
                 this.sendResult(typeOperation, result);
-            } else {
-                if (isEnteredNewValue && !isOperationPressed) {
-                    result = this.sendOperation(typeOperation, parseFloat(this.getTextDisplay()), valueForProgressive);
-                } else {
-                    result = this.sendOperation(typeOperation, currentValue, valueForProgressive);
-                }
-                this.sendResult(typeOperation, result);
+
+                return;
             }
+
+            if (isEnteredNewValue && !isOperationPressed) {
+                result = this.sendOperation(typeOperation, parseFloat(this.getTextDisplay()), valueForProgressive);
+                this.sendResult(typeOperation, result);
+
+                return;
+            }
+            result = this.sendOperation(typeOperation, currentValue, valueForProgressive);
+            this.sendResult(typeOperation, result);
         }
     }
 
