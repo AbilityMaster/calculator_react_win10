@@ -13,6 +13,8 @@ export default class Calculator extends Component {
     constructor() {
         super();
         this.localStorage = new LocalStorage(projectInfo.version, projectInfo.name);
+        const isLCEmpty = this.localStorage.isEmpty;
+        const { isDisabledMemoryButtons, memoryValues, mode, positionAttribute } = this.localStorage.dataset;
         this.defaultSettings = {
             mode: CALC_MODES.DEFAULT,
             x: `${(window.innerWidth - 320) / window.innerWidth * 100}%`,
@@ -21,7 +23,7 @@ export default class Calculator extends Component {
             positionAttribute: 0,
             memoryValues: []
         }
-        this.localStorage.dataset = this.localStorage.isEmpty ? this.defaultSettings : false;
+        this.localStorage.dataset = isLCEmpty ? this.defaultSettings : this.localStorage.dataset;
         this.state = {
             isDisabledOperations: false,
             isResultPressed: false,
@@ -40,14 +42,14 @@ export default class Calculator extends Component {
             isOpenMemoryWindow: false,
             historyValues: [],
             isDisabledMemoryButtonsAll: false,
-            isDisabledMemoryButtons: (this.localStorage.isEmpty) ? true : this.localStorage.dataset.isDisabledMemoryButtons,
-            memoryValues: (this.localStorage.isEmpty) ? [] : this.localStorage.dataset.memoryValues,
-            mode: (this.localStorage.isEmpty) ? CALC_MODES.DEFAULT : this.localStorage.dataset.mode,
-            positionAttribute: (this.localStorage.isEmpty) ? 0 : this.localStorage.dataset.positionAttribute,
+            isDisabledMemoryButtons: isLCEmpty ? true : isDisabledMemoryButtons,
+            memoryValues: isLCEmpty ? [] : memoryValues,
+            mode: isLCEmpty ? CALC_MODES.DEFAULT : mode,
+            positionAttribute: isLCEmpty ? 0 : positionAttribute,
         };
         this.coords = {
-            x: (this.localStorage.isEmpty) ? this.defaultSettings.x : this.localStorage.dataset.x,
-            y: (this.localStorage.isEmpty) ? this.defaultSettings.y : this.localStorage.dataset.y
+            x: isLCEmpty ? this.defaultSettings.x : this.localStorage.dataset.x,
+            y: isLCEmpty ? this.defaultSettings.y : this.localStorage.dataset.y
         };
         this.$calculator = React.createRef();
     }
@@ -126,14 +128,15 @@ export default class Calculator extends Component {
         }
 
         // eslint-disable-next-line
-        data = data.replace(/\&nbsp\;/g, "\xa0");
+        data = data.replace(/\&nbsp\;/g, '\xa0');
         data = data.replace(/\s+/g, '');
         data = data.replace(',', '.');
 
         return data;
     }
 
-    handleChangeValue = (number) => {
+    handleChangeValue = (event) => {
+        const number = event.target.innerHTML;
         const { isDisabledOperations, isNeedNewValueInDisplay, isResultPressed, displayValue } = this.state;
 
         if (isDisabledOperations) {
@@ -369,7 +372,8 @@ export default class Calculator extends Component {
         }
     }
 
-    operation = (operation) => {
+    operation = (event) => {
+        const operation = event.target.innerHTML;
         const { isDisabledOperations, currentValue, isPressedSingleOperation, isEnteredNewValue,
             isOperationPressed, isResultPressed, valueForProgressive, typeOperation } = this.state;
 
@@ -421,7 +425,8 @@ export default class Calculator extends Component {
         });
     };
 
-    singleOperation = (operation) => {
+    singleOperation = (event) => {
+        const operation = event.target.dataset.type;
         const { isDisabledOperations, currentValue } = this.state;
 
         if (isDisabledOperations || (operation === OPERATIONS.PERCENT && currentValue === null)) {
@@ -434,7 +439,7 @@ export default class Calculator extends Component {
         this.setState({ isPressedSingleOperation: true });
 
         if (currentValue === null) {
-           this.setState({ currentValue: parseFloat(this.getTextDisplay()) });
+            this.setState({ currentValue: parseFloat(this.getTextDisplay()) });
         }
 
         let result = this.sendOperation(operation, parseFloat(this.getTextDisplay()));
@@ -443,19 +448,15 @@ export default class Calculator extends Component {
 
     result = () => {
         const { isDisabledOperations, typeOperation, isEnteredNewValue, isOperationPressed, currentValue, isNeedValueForProgressive, valueForProgressive } = this.state;
+        let result = 0;
 
         if (isDisabledOperations || typeOperation === null) {
             return;
         }
 
         this.SDclear();
-        this.setState({ isResultPressed: true });
-
-        if (isEnteredNewValue && !isOperationPressed) {
-            this.setState({ currentValue: parseFloat(this.getTextDisplay()) });
-        }
-
         this.setState({
+            isResultPressed: true,
             isEnteredNewValue: false,
             isOperationPressed: false,
             isPressedSingleOperation: false
@@ -468,10 +469,14 @@ export default class Calculator extends Component {
                     isNeedValueForProgressive: false
                 });
 
-                let result = this.sendOperation(typeOperation, currentValue, parseFloat(this.getTextDisplay()));
+                result = this.sendOperation(typeOperation, currentValue, parseFloat(this.getTextDisplay()));
                 this.sendResult(typeOperation, result);
             } else {
-                let result = this.sendOperation(typeOperation, currentValue, valueForProgressive);
+                if (isEnteredNewValue && !isOperationPressed) {
+                    result = this.sendOperation(typeOperation, parseFloat(this.getTextDisplay()), valueForProgressive);
+                } else {                    
+                    result = this.sendOperation(typeOperation, currentValue, valueForProgressive);
+                }
                 this.sendResult(typeOperation, result);
             }
         }
@@ -704,47 +709,50 @@ export default class Calculator extends Component {
         });
     }
 
-    get classNames() {
+    get classForState() {
         const { mode } = this.state;
-        const classNames = ['calculator'];
+        const classNames = {
+            calc: ['calculator'],
+            calcBody: ['calculator__body'],
+            openCalcButton: ['open-calculator']
+        }
 
         switch (mode) {
             case CALC_MODES.STANDART: {
-                classNames.push('standart');
-
                 return {
-                    calcBody: 'calculator-body displayBlock',
-                    calc: classNames.join(' '),
-                    button: 'open-calculator'
+                    calc: classNames.calc.join(' '),
+                    calcBody: classNames.calcBody.join(' '),
+                    openCalcButton: classNames.openCalcButton.join(' '),
                 }
             }
             case CALC_MODES.MINIMIZED: {
-                classNames.push('minimized');
+                classNames.calc.push('calculator_minimized');
+                classNames.calcBody.push('calculator__body_hidden');
 
                 return {
-                    calcBody: 'calculator-body closed',
-                    calc: classNames.join(' '),
-                    button: 'open-calculator'
+                    calc: classNames.calc.join(' '),
+                    calcBody: classNames.calcBody.join(' '),
+                    openCalcButton: classNames.openCalcButton.join(' '),
                 }
             }
             case CALC_MODES.CLOSED: {
-                classNames.push('closed');
+                classNames.calc.push('calculator_closed');
+                classNames.openCalcButton.push('open-calculator_visible');
 
                 return {
-                    calcBody: 'calculator-body',
-                    calc: classNames.join(' '),
-                    button: 'open-calculator displayBlock'
+                    calc: classNames.calc.join(' '),
+                    calcBody: classNames.calcBody.join(' '),
+                    openCalcButton: classNames.openCalcButton.join(' '),
                 }
             }
             case CALC_MODES.DEFAULT: {
-                classNames.push('standart');
                 this.coords.x = `${(window.innerWidth - 320) / window.innerWidth * 100}%`;
                 this.coords.y = `${(window.innerHeight - 540) / window.innerHeight * 100}%`;
 
                 return {
-                    calcBody: 'calculator-body displayBlock',
-                    calc: classNames.join(' '),
-                    button: 'open-calculator'
+                    calc: classNames.calc.join(' '),
+                    calcBody: classNames.calcBody.join(' '),
+                    openCalcButton: classNames.openCalcButton.join(' '),
                 }
             }
             default: {
@@ -808,7 +816,7 @@ export default class Calculator extends Component {
 
     memorySave = () => {
         const { isOpenMemoryWindow, isDisabledOperations, isDisabledMemoryButtons, positionAttribute, memoryValues } = this.state;
-        
+
         if (isOpenMemoryWindow || isDisabledOperations) {
             return;
         }
@@ -820,7 +828,7 @@ export default class Calculator extends Component {
         }
 
         this.addToMemory(this.getTextDisplay());
-        
+
         this.localStorage.dataset = {
             memoryValues: memoryValues,
             positionAttribute: positionAttribute + 1,
@@ -972,88 +980,22 @@ export default class Calculator extends Component {
         this.setState({ memoryValues: memoryValues });
     }
 
-    btnSettings = {
-        memoryClearButton: {
-            style: 'calc-add__button calc-add__button_memory-clear js-calc-add__button_memory-clear',
-            dataAttribute: OPERATIONS.ADDITIONAL.MCLEAR
-        },
-        memoryReadButton: {
-            style: 'calc-add__button calc-add__button_read js-calc-add__button_read',
-            dataAttribute: OPERATIONS.ADDITIONAL.MREAD
-        },
-        memoryPlusButton: {
-            style: 'calc-add__button calc-add__button_plus js-calc-add__button_plus',
-            dataAttribute: OPERATIONS.ADDITIONAL.MPLUS
-        },
-        memoryMinusButton: {
-            style: 'calc-add__button calc-add__button_minus js-calc-add__button_minus',
-            dataAttribute: OPERATIONS.ADDITIONAL.MMINUS
-        },
-        memorySaveButton: {
-            style: 'calc-add__button calc-add__button_ms js-calc-add__button_ms',
-            dataAttribute: OPERATIONS.ADDITIONAL.MSAVE
-        },
-        memoryOpenButton: {
-            style: 'calc-add__button calc-add__button_memory js-calc-add__button_memory',
-            dataAttribute: OPERATIONS.ADDITIONAL.MEMORY
-        },
-        percentBtn: {
-            style: 'calc__button calc__button_percent js-calc__button_percent',
-            dataAttribute: OPERATIONS.ADDITIONAL.PERCENT,
-            percent: this.percent
-        },
-        sqrtBtn: {
-            style: 'calc__button calc__button_sqrt js-calc__button_sqrt',
-            dataAttribute: OPERATIONS.ADDITIONAL.SQRT,
-            singleOperation: this.singleOperation
-        },
-        powBtn: {
-            style: 'calc__button calc__button_pow js-calc__button_pow',
-            dataAttribute: OPERATIONS.ADDITIONAL.POW,
-            singleOperation: this.singleOperation
-        },
-        fracBtn: {
-            style: 'calc__button calc__button_frac js-calc__button_frac',
-            dataAttribute: OPERATIONS.ADDITIONAL.FRAC,
-            singleOperation: this.singleOperation
-        },
-        ceBtn: {
-            style: 'calc__button calc__button_disabled',
-            dataAttribute: ''
-        },
-        clearBtn: {
-            style: 'calc__button calc__button_clear js-calc__button_clear',
-            dataAttribute: OPERATIONS.ADDITIONAL.CLEAR
-        },
-        backspaceBtn: {
-            style: 'calc__button calc__button_backspace js-calc__button_backspace',
-            dataAttribute: OPERATIONS.ADDITIONAL.BACKSPACE
-        },
-        operationBtn: {
-            style: 'calc__button calc__button_operation js-calc__button_operation',
-            dataAttribute: OPERATIONS.ADDITIONAL.DIVIDE
-        },
-        number: {
-            style: 'calc__button calc__button_number js-calc__button_number',
-            dataAttribute: 'number',
-            updateDisplayValue: this.handleChangeValue
-        },
-        operation: {
-            style: 'calc__button calc__button_operation js-calc__button_operation',
-            dataAttribute: 'operation',
-            operation: this.operation
-        },
-        reverseBtn: {
-            style: 'calc__button calc__button_reverse js-calc__button_reverse',
-            dataAttribute: OPERATIONS.ADDITIONAL.REVERSE
-        },
-        addPointBtn: {
-            style: 'calc__button calc__button_add-point js-calc__button_add-point',
-            dataAttribute: OPERATIONS.ADDITIONAL.POINT
-        },
-        resultBtn: {
-            style: 'calc__button calc__button_get-result js-calc__button_get-result',
-            dataAttribute: OPERATIONS.ADDITIONAL.RESULT
+    get classNames() {
+        return {
+            memoryButton: 'calculator__memory-button',
+            defaultButton: 'calculator__button',
+            powButton: 'calculator__button calculator__button_pow',
+            fracButton: 'calculator__button calculator__button_frac',
+            ceButton: 'calculator__button calculator__button_disabled',
+            numberButton: 'calculator__button calculator__button_number'
+        }
+    }
+
+    get dataAttributes() {
+        return {
+            pow: OPERATIONS.POW,
+            sqrt: OPERATIONS.SQRT,
+            frac: OPERATIONS.FRAC
         }
     }
 
@@ -1064,27 +1006,26 @@ export default class Calculator extends Component {
             <React.Fragment>
                 <div
                     onClick={this.buttonOpenCalculator}
-                    className={this.classNames.button}
+                    className={this.classForState.openCalcButton}
                 >Open calc</div>
                 <div
                     ref={this.$calculator}
                     onDragStart={this.calculatorDragStart}
-                    className={this.classNames.calc}
+                    className={this.classForState.calc}
                     style={{
                         left: this.coords.x,
                         top: this.coords.y
                     }}>
-                    <div className="index-menu">
-                        <p onMouseDown={this.calculatorDragAndDrop} className="index-menu__title">Калькулятор</p>
-                        <div onClick={this.buttonTrey} className="index-menu__button index-menu__button_trey">–</div>
-                        <div onClick={this.buttonOpen} className="index-menu__button index-menu__button_open">☐</div>
-                        <div onClick={this.buttonClose} className="index-menu__button index-menu__button_close">✕</div>
+                    <div className='calculator__header-menu'>
+                        <p onMouseDown={this.calculatorDragAndDrop} className='calculator__title'>Калькулятор</p>
+                        <div onClick={this.buttonTrey} className='calculator__header-button calculator__header-button_trey'>–</div>
+                        <div onClick={this.buttonOpen} className='calculator__header-button calculator__header-button_open'>☐</div>
+                        <div onClick={this.buttonClose} className='calculator__header-button calculator__header-button_close'>✕</div>
                     </div>
-                    <div className={this.classNames.calcBody}>
-                        <div className="option-menu">
-                            <div className="option-menu__btn-menu">☰</div>
-                            <p className="option-menu__title">Обычный</p>
-                            <div className="option-menu__btn-journal" />
+                    <div className={this.classForState.calcBody}>
+                        <div className='calculator__option-menu'>
+                            <div className='calculator__option-button'>☰</div>
+                            <p className='calculator__option-title'>Обычный</p>
                         </div>
                         <HistoryDisplay
                             displayHistoryValue={displayHistoryValue}
@@ -1093,113 +1034,173 @@ export default class Calculator extends Component {
                             displayFontSize={displayFontSize}
                             value={displayValue}
                         />
-                        <div className="button-area">
-                            <div className="calc calc-add">
+                        <div className='calculator__button-area'>
+                            <div className='calculator__row'>
                                 <Button
                                     isDisabledMemoryButtonsAll={isDisabledMemoryButtonsAll}
                                     isOpenMemoryWindow={isOpenMemoryWindow}
                                     isDisabledMemoryButtons={isDisabledMemoryButtons}
-                                    btnSettings={this.btnSettings.memoryClearButton}
-                                    memoryClear={this.memoryClear}
+                                    classes={this.classNames.memoryButton}
+                                    onClick={this.memoryClear}
                                 >MC</Button>
                                 <Button
                                     isDisabledMemoryButtonsAll={isDisabledMemoryButtonsAll}
                                     isOpenMemoryWindow={isOpenMemoryWindow}
-                                    memoryRead={this.memoryRead}
+                                    onClick={this.memoryRead}
                                     isDisabledMemoryButtons={isDisabledMemoryButtons}
-                                    btnSettings={this.btnSettings.memoryReadButton}
+                                    classes={this.classNames.memoryButton}
                                 >MR</Button>
                                 <Button
                                     isDisabledMemoryButtonsAll={isDisabledMemoryButtonsAll}
                                     isOpenMemoryWindow={isOpenMemoryWindow}
-                                    memoryPlus={this.memoryPlus}
-                                    btnSettings={this.btnSettings.memoryPlusButton}
+                                    onClick={this.memoryPlus}
+                                    classes={this.classNames.memoryButton}
                                 >M<span>+</span></Button>
                                 <Button
                                     isDisabledMemoryButtonsAll={isDisabledMemoryButtonsAll}
                                     isOpenMemoryWindow={isOpenMemoryWindow}
-                                    memoryMinus={this.memoryMinus}
-                                    btnSettings={this.btnSettings.memoryMinusButton}
+                                    onClick={this.memoryMinus}
+                                    classes={this.classNames.memoryButton}
                                 >M<span>-</span></Button>
                                 <Button
                                     isDisabledMemoryButtonsAll={isDisabledMemoryButtonsAll}
                                     isOpenMemoryWindow={isOpenMemoryWindow}
-                                    memorySave={this.memorySave}
-                                    btnSettings={this.btnSettings.memorySaveButton}
+                                    onClick={this.memorySave}
+                                    classes={this.classNames.memoryButton}
                                 >MS</Button>
                                 <Button
                                     isDisabledMemoryButtonsAll={isDisabledMemoryButtonsAll}
                                     isDisabledMemoryButtons={isDisabledMemoryButtons}
-                                    memoryOpen={this.memoryOpen}
-                                    btnSettings={this.btnSettings.memoryOpenButton}
+                                    onClick={this.memoryOpen}
+                                    classes={this.classNames.memoryButton}
                                 >M</Button>
                             </div>
-                            <div className="calc">
+                            <div className='calculator__row'>
                                 <Button
                                     isDisabled={isDisabled}
-                                    percent={this.percent}
-                                    btnSettings={this.btnSettings.percentBtn}
+                                    onClick={this.percent}
+                                    classes={this.classNames.defaultButton}
                                 >%</Button>
                                 <Button
                                     isDisabled={isDisabled}
-                                    btnSettings={this.btnSettings.sqrtBtn}
+                                    classes={this.classNames.defaultButton}
+                                    onClick={this.singleOperation}
+                                    dataAttributes={this.dataAttributes.sqrt}
                                 >√</Button>
                                 <Button
                                     isDisabled={isDisabled}
-                                    btnSettings={this.btnSettings.powBtn}
-                                ><span className="span">x</span></Button>
+                                    classes={this.classNames.powButton}
+                                    onClick={this.singleOperation}
+                                    dataAttributes={this.dataAttributes.pow}
+                                >
+                                    <span className='span'>x</span>
+                                </Button>
                                 <Button
                                     isDisabled={isDisabled}
-                                    btnSettings={this.btnSettings.fracBtn}
-                                ><span className="span">/</span></Button>
+                                    classes={this.classNames.fracButton}
+                                    onClick={this.singleOperation}
+                                    dataAttributes={this.dataAttributes.frac}
+                                >
+                                    <span className='span'>/</span>
+                                </Button>
                             </div>
-                            <div className="calc">
-                                <Button btnSettings={this.btnSettings.ceBtn}>CE</Button>
-                                <Button btnSettings={this.btnSettings.clearBtn} clear={this.clear}>C</Button>
-                                <Button btnSettings={this.btnSettings.backspaceBtn} backspace={this.backspace}>{`<-`}</Button>
-                                <Button isDisabled={isDisabled} btnSettings={this.btnSettings.operation}>÷</Button>
-                            </div>
-                            <div className="calc">
-                                <Button btnSettings={this.btnSettings.number}>7</Button>
-                                <Button btnSettings={this.btnSettings.number}>8</Button>
-                                <Button btnSettings={this.btnSettings.number}>9</Button>
-                                <Button isDisabled={isDisabled} btnSettings={this.btnSettings.operation}>*</Button>
-                            </div>
-                            <div className="calc">
-                                <Button btnSettings={this.btnSettings.number}>4</Button>
-                                <Button btnSettings={this.btnSettings.number}>5</Button>
-                                <Button btnSettings={this.btnSettings.number}>6</Button>
-                                <Button isDisabled={isDisabled} btnSettings={this.btnSettings.operation}>-</Button>
-                            </div>
-                            <div className="calc">
-                                <Button btnSettings={this.btnSettings.number}>1</Button>
-                                <Button btnSettings={this.btnSettings.number}>2</Button>
-                                <Button btnSettings={this.btnSettings.number}>3</Button>
-                                <Button isDisabled={isDisabled} btnSettings={this.btnSettings.operation}>+</Button>
-                            </div>
-                            <div className="calc">
+                            <div className='calculator__row'>
+                                <Button classes={this.classNames.ceButton}>CE</Button>
+                                <Button
+                                    classes={this.classNames.defaultButton}
+                                    onClick={this.clear}
+                                >C</Button>
+                                <Button
+                                    classes={this.classNames.defaultButton}
+                                    onClick={this.backspace}
+                                >{`<-`}</Button>
                                 <Button
                                     isDisabled={isDisabled}
-                                    reverse={this.reverse}
-                                    btnSettings={this.btnSettings.reverseBtn}
+                                    classes={this.classNames.defaultButton}
+                                    onClick={this.operation}
+                                >÷</Button>
+                            </div>
+                            <div className='calculator__row'>
+                                <Button
+                                    classes={this.classNames.numberButton}
+                                    onClick={this.handleChangeValue}
+                                >7</Button>
+                                <Button
+                                    classes={this.classNames.numberButton}
+                                    onClick={this.handleChangeValue}
+                                >8</Button>
+                                <Button
+                                    classes={this.classNames.numberButton}
+                                    onClick={this.handleChangeValue}
+                                >9</Button>
+                                <Button
+                                    isDisabled={isDisabled}
+                                    classes={this.classNames.defaultButton}
+                                    onClick={this.operation}>*</Button>
+                            </div>
+                            <div className='calculator__row'>
+                                <Button
+                                    classes={this.classNames.numberButton}
+                                    onClick={this.handleChangeValue}
+                                >4</Button>
+                                <Button
+                                    classes={this.classNames.numberButton}
+                                    onClick={this.handleChangeValue}
+                                >5</Button>
+                                <Button
+                                    classes={this.classNames.numberButton}
+                                    onClick={this.handleChangeValue}
+                                >6</Button>
+                                <Button
+                                    isDisabled={isDisabled} classes={this.classNames.defaultButton}
+                                    onClick={this.operation}
+                                >-</Button>
+                            </div>
+                            <div className='calculator__row'>
+                                <Button
+                                    classes={this.classNames.numberButton}
+                                    onClick={this.handleChangeValue}
+                                >1</Button>
+                                <Button
+                                    classes={this.classNames.numberButton}
+                                    onClick={this.handleChangeValue}
+                                >2</Button>
+                                <Button
+                                    classes={this.classNames.numberButton}
+                                    onClick={this.handleChangeValue}
+                                >3</Button>
+                                <Button
+                                    isDisabled={isDisabled}
+                                    classes={this.classNames.defaultButton}
+                                    onClick={this.operation}
+                                >+</Button>
+                            </div>
+                            <div className='calculator__row'>
+                                <Button
+                                    isDisabled={isDisabled}
+                                    onClick={this.reverse}
+                                    classes={this.classNames.defaultButton}
                                 >±</Button>
-                                <Button btnSettings={this.btnSettings.number}>0</Button>
+                                <Button
+                                    classes={this.classNames.numberButton}
+                                    onClick={this.handleChangeValue}
+                                >0</Button>
                                 <Button
                                     isDisabled={isDisabled}
-                                    addPoint={this.addPoint}
-                                    btnSettings={this.btnSettings.addPointBtn}>,</Button>
+                                    onClick={this.addPoint}
+                                    classes={this.classNames.defaultButton}>,</Button>
                                 <Button
                                     isDisabled={isDisabled}
-                                    result={this.result}
-                                    btnSettings={this.btnSettings.resultBtn}
+                                    onClick={this.result}
+                                    classes={this.classNames.defaultButton}
                                 >=</Button>
                             </div>
                             <Memory
                                 onClearMemoryItem={this.onClearMemoryItem}
                                 updateLocalStorage={this.updateLocalStorage}
                                 displayValue={displayValue}
-                                isOpenMemoryWindow={isOpenMemoryWindow}
-                                memoryValues={memoryValues}
+                                isOpen={isOpenMemoryWindow}
+                                values={memoryValues}
                             />
                         </div>
                     </div>

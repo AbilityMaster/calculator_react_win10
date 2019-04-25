@@ -24,6 +24,9 @@ body, html {
 }
 
 .open-calculator {
+	&_visible {
+		display: block;
+	}
 	position: fixed;
 	display: none;
 	right: 40px;
@@ -37,14 +40,13 @@ body, html {
 	box-shadow: 0 0 0px 0px rgba(0, 0, 0, 0.25);
 	border-radius: 50px;
 	animation: pulse 2s infinite;
-}
-
-.open-calculator:hover {
-	cursor: pointer;
-	border: 1px solid #3497e0;
-	box-shadow: 0 0 17px 5px rgba(0, 0, 0, 0.25);
-	transition: box-shadow .2s;
-	animation: pulse .7s infinite;
+	&:hover {
+		cursor: pointer;
+		border: 1px solid #3497e0;
+		box-shadow: 0 0 17px 5px rgba(0, 0, 0, 0.25);
+		transition: box-shadow .2s;
+		animation: pulse .7s infinite;
+	}
 }
 
 .calculator {
@@ -65,13 +67,23 @@ body, html {
 .draggble {
 	cursor: pointer;
 }
-.index-menu {
-	margin: 0;
-	font-size: $font-size__index-menu;
-	display: -webkit-flex;
-	display: flex; 
-	align-items: center;
-	justify-content: flex-end;
+
+.calculator {
+	&_minimized {
+		height: 32px;
+		bottom: auto;
+	}
+	&_closed {
+		display: none;
+	}
+	&__header-menu {
+		margin: 0;
+		font-size: $font-size__header-menu;
+		display: -webkit-flex;
+		display: flex; 
+		align-items: center;
+		justify-content: flex-end;		
+	}
 	&__title {
 		margin: 0;
 		height: 32px;		
@@ -86,7 +98,7 @@ body, html {
 			_cursor: hand;
 		}
 	}
-	&__button {
+	&__header-button {
 		text-align: center;
 		padding: 6px 0;
 		width: 48px;
@@ -101,65 +113,68 @@ body, html {
 			cursor: pointer;
 		}
 	}
-}
-
-.option-menu {
-	display: -webkit-flex;
-	display: flex;
-	align-items: center;
-	&__title {
-		font-size: 20px;
-		font-weight: 400px;
-		margin: 0;
+	&__body {
+		&_hidden {
+			display: none;
+		}
 	}
-	&__btn-menu {
+	&__option-menu {
+		display: -webkit-flex;
+		display: flex;
+		align-items: center;
+	}
+	&__option-button {
 		padding: 12px 20px;
 		&:hover {
 			background: #c6c6c6;
 		}
 	}
-}
-
-.group-small-display {
-	position: relative;
-	display: flex;
-	align-items: center;
-	justify-content: flex-end;
-}
-.small-display {
-	height: 20px;
-	opacity: 0.5;
-	position: relative;
-	overflow: hidden;
-	text-align: right;
-	margin: 0 17px;
-	white-space: nowrap;
-	line-height: 20px;
-	overflow-x: scroll;
-	&::-webkit-scrollbar { 
-		width: 0 !important;
-  		height: 0;
-		display: none !important;
- 		background: transparent;
+	&__option-title {
+		font-size: 20px;
+		font-weight: 400px;
+		margin: 0;
 	}
-	&__block {
-		width: auto;
-		position: absolute;
-		right: 0;
+	&__history {
+		position: relative;
+		display: flex;
+		align-items: center;
+		justify-content: flex-end;
+	}
+	&__history-display {
+		height: 20px;
+		opacity: 0.5;
+		position: relative;
+		overflow: hidden;
+		text-align: right;
+		margin: 0 17px;
+		white-space: nowrap;
 		line-height: 20px;
-		height: 20px;
+		overflow-x: scroll;
+		&::-webkit-scrollbar { 
+			width: 0 !important;
+			  height: 0;
+			display: none !important;
+			 background: transparent;
+		}
+		&__block {
+			width: auto;
+			position: absolute;
+			right: 0;
+			line-height: 20px;
+			height: 20px;
+		}
+		&__add {
+			visibility: hidden;
+			position: absolute;
+			right: 0;
+			height: 20px;
+		}		
 	}
-	&__add {
-		visibility: hidden;
+	&__history-button {
 		position: absolute;
-		right: 0;
 		height: 20px;
-	}
-	&__button {
-		position: absolute;
-		height: 100%;
 		width: 20px;
-		&_left {
+		&_move-left {
 			left: 0;
 			width: 20px;
 			background: url('../img/left.png') no-repeat center;
@@ -170,7 +185,7 @@ body, html {
 				cursor: pointer;
 			}
 		}
-		&_right {
+		&_move-right {
 			right: 0;
 			background: url('../img/right.png') no-repeat center;
 			background-size: contain;
@@ -181,23 +196,22 @@ body, html {
 			}
 		}
 	}
-}
-.display {
-	height: 50px;
-	text-align: right;
-	font-weight: 600;
-	line-height: 50px;
-	font-size: $font-size__display;
-	padding: 20px 10px;
-}
-
-.button-area {
-	padding: 0 3px 3px 3px;
-	position: relative;
-}
-
-.calc-add {
-	&__button {
+	&__display {
+		height: 50px;
+		text-align: right;
+		font-weight: 600;
+		line-height: 50px;
+		font-size: $font-size__display;
+		padding: 20px 10px;
+		&_small {			
+			font-size: 20px;
+		}
+	}
+	&__button-area {
+		padding: 0 3px 3px 3px;
+		position: relative;
+	}
+	&__memory-button {
 		font-size: $font-size__calc-add__button;
 		font-weight: 600;
 		width: 100%;
@@ -220,11 +234,10 @@ body, html {
 			}
 		}
 	}
-}
-
-.calc {
-	display: -webkit-flex;
-	display: flex;
+	&__row {
+		display: -webkit-flex;
+		display: flex;		
+	}
 	&__button {
 		background: $background-color___calc__button;
 		width: 100px;
@@ -252,6 +265,7 @@ body, html {
 			background: $background-color___calc__button_number;
 		}
 		&_frac .span {
+			pointer-events: none;
 			position: relative;
 			&::before {
 				content: '1';
@@ -269,6 +283,7 @@ body, html {
 			}
 		}
 		&_pow .span {
+			pointer-events: none;
 			position: relative;
 			font-style: italic;
 			&::before {
@@ -280,29 +295,34 @@ body, html {
 			}
 		}
 	}
-}
-
-
-
-::-webkit-scrollbar {
-	width: 3px;
-}
-::-webkit-scrollbar-thumb {
-	background: #757575;
-	margin-right: 10px;
-
-	border-radius: 2px;
-}
-.memory {
-	position: absolute;
-	top: 32px;
-	bottom: 0;
-	left: 0;
-	right: 0;
-	visibility: hidden;
-	background: url(../img/back.png);
-	overflow-y: scroll;
-	&__btn {
+	&__memory-board {
+		position: absolute;
+		top: 32px;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		visibility: hidden;
+		background: url(../img/back.png);
+		overflow-y: scroll;
+		&_visible {
+			visibility: visible;
+		}
+	}
+	&__memory-item {
+		height: 67px;
+		font-size: 25px;
+		padding: 10px 20px 10px 20px;
+		text-align: right;
+		&:hover {
+			background: #dbdbdb;
+			cursor: default;
+		}
+	}
+	&__memory-board-btn {
+		&_visible {
+			opacity: 1;
+			cursor: pointer;
+		}
 		opacity: 0;
 		display: inline-block;
 		font-size: 18px;
@@ -318,48 +338,13 @@ body, html {
 			color: #fff;
 		}
 	}
-	&__btn_m_minus {
-		display: inline-block;
-	}
-	&__block {
-		height: 67px;
-		font-size: 25px;
-		padding: 10px 20px 10px 20px;
-		text-align: right;
-		&:hover {
-			background: #dbdbdb;
-			cursor: default;
-		}
-	}
 }
 
-.visible {
-	opacity: 1;
-	cursor: pointer;
+::-webkit-scrollbar {
+	width: 3px;
 }
-
-.visibility {
-	visibility: visible;
-}
-
-.display_small {
-	font-size: 20px;
-}
-
-.standart {
-	display: block;
-	height: 540px;
-}
-
-.minimized {
-	height: 32px;
-	bottom: auto;
-}
-
-.displayBlock {
-	display: block;
-}
-
-.closed {
-	display: none;
+::-webkit-scrollbar-thumb {
+	background: #757575;
+	margin-right: 10px;
+	border-radius: 2px;
 }

@@ -15,10 +15,10 @@ export default class Display extends Component {
 
     get classes() {
         const { displayFontSize } = this.props;
-        const classNames = ['display'];
+        const classNames = ['calculator__display'];
 
         if (displayFontSize === STYLES.SMALL) {
-            classNames.push('display_small');
+            classNames.push('calculator__display_small');
 
             return classNames.join(' ');
         }
