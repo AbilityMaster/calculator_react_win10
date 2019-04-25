@@ -4,7 +4,6 @@ class LocalStorage {
 	}
 
 	set dataset(obj) {
-	
 		let temp = JSON.parse(localStorage.getItem(this.key));
 	
 		if (temp) {
@@ -32,7 +31,7 @@ class LocalStorage {
 		} 
 		localStorage.setItem(this.key, JSON.stringify(obj));
 	}
-	//true false geter
+	
 	get isEmpty() {
 		return (this.dataset === null)
 	}
