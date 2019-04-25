@@ -25,6 +25,7 @@ export default class Calculator extends Component {
         }
         this.localStorage.dataset = isLCEmpty ? this.defaultSettings : this.localStorage.dataset;
         this.state = {
+            clearButtons: false,
             isDisabledOperations: false,
             isResultPressed: false,
             isOperationPressed: false,
@@ -63,6 +64,7 @@ export default class Calculator extends Component {
         }
 
         this.setState({
+            clearButtons: true,
             isPressedSingleOperation: false,
             displayValue: '0',
             isDisabled: false,
@@ -77,6 +79,8 @@ export default class Calculator extends Component {
             typeOperation: null,
             isEnteredNewValue: true,
             historyValues: []
+        }, () => {
+            this.setState({ clearButtons: false });
         });
     }
 
@@ -1058,7 +1062,7 @@ export default class Calculator extends Component {
     }
 
     render() {
-        const { memoryValues, displayValue, isOpenMemoryWindow, displayHistoryValue, displayFontSize } = this.state;
+        const { memoryValues, displayValue, isOpenMemoryWindow, displayHistoryValue, displayFontSize, clearButtons } = this.state;
 
         return (
             <React.Fragment>
@@ -1086,6 +1090,7 @@ export default class Calculator extends Component {
                             <p className='calculator__option-title'>Обычный</p>
                         </div>
                         <HistoryDisplay
+                            clearPressed={clearButtons}
                             displayHistoryValue={displayHistoryValue}
                         />
                         <Display
@@ -1095,49 +1100,49 @@ export default class Calculator extends Component {
                         <div className='calculator__button-area'>
                             <div className='calculator__row'>
                                 <Button
-                                    classes={this.classNames.memoryButtonsDefaultDisabled.mClear}
+                                    className={this.classNames.memoryButtonsDefaultDisabled.mClear}
                                     onClick={this.memoryClear}
                                 >MC</Button>
                                 <Button
                                     onClick={this.memoryRead}
-                                    classes={this.classNames.memoryButtonsDefaultDisabled.mRead}
+                                    className={this.classNames.memoryButtonsDefaultDisabled.mRead}
                                 >MR</Button>
                                 <Button
                                     onClick={this.memoryPlus}
-                                    classes={this.classNames.memoryButtonsDefaultUnDisabled.mPlus}
+                                    className={this.classNames.memoryButtonsDefaultUnDisabled.mPlus}
                                 >M<span>+</span></Button>
                                 <Button
                                     onClick={this.memoryMinus}
-                                    classes={this.classNames.memoryButtonsDefaultUnDisabled.mMinus}
+                                    className={this.classNames.memoryButtonsDefaultUnDisabled.mMinus}
                                 >M<span>-</span></Button>
                                 <Button
                                     onClick={this.memorySave}
-                                    classes={this.classNames.memoryButtonsDefaultUnDisabled.mSave}
+                                    className={this.classNames.memoryButtonsDefaultUnDisabled.mSave}
                                 >MS</Button>
                                 <Button
                                     onClick={this.memoryOpen}
-                                    classes={this.classNames.memoryButtonsDefaultDisabled.mOpen}
+                                    className={this.classNames.memoryButtonsDefaultDisabled.mOpen}
                                 >M</Button>
                             </div>
                             <div className='calculator__row'>
                                 <Button
                                     onClick={this.percent}
-                                    classes={this.classNames.buttonsCanBeDisabled.default}
+                                    className={this.classNames.buttonsCanBeDisabled.default}
                                 >%</Button>
                                 <Button
-                                    classes={this.classNames.buttonsCanBeDisabled.default}
+                                    className={this.classNames.buttonsCanBeDisabled.default}
                                     onClick={this.singleOperation}
                                     dataAttributes={this.dataAttributes.sqrt}
                                 >√</Button>
                                 <Button
-                                    classes={this.classNames.buttonsCanBeDisabled.pow}
+                                    className={this.classNames.buttonsCanBeDisabled.pow}
                                     onClick={this.singleOperation}
                                     dataAttributes={this.dataAttributes.pow}
                                 >
                                     <span className='span'>x</span>
                                 </Button>
                                 <Button
-                                    classes={this.classNames.buttonsCanBeDisabled.frac}
+                                    className={this.classNames.buttonsCanBeDisabled.frac}
                                     onClick={this.singleOperation}
                                     dataAttributes={this.dataAttributes.frac}
                                 >
@@ -1145,88 +1150,88 @@ export default class Calculator extends Component {
                                 </Button>
                             </div>
                             <div className='calculator__row'>
-                                <Button classes={this.classNames.ceButton}>CE</Button>
+                                <Button className={this.classNames.ceButton}>CE</Button>
                                 <Button
-                                    classes={this.classNames.default}
+                                    className={this.classNames.default}
                                     onClick={this.clear}
                                 >C</Button>
                                 <Button
-                                    classes={this.classNames.default}
+                                    className={this.classNames.default}
                                     onClick={this.backspace}
                                 >{`<-`}</Button>
                                 <Button
-                                    classes={this.classNames.buttonsCanBeDisabled.default}
+                                    className={this.classNames.buttonsCanBeDisabled.default}
                                     onClick={this.operation}
                                 >÷</Button>
                             </div>
                             <div className='calculator__row'>
                                 <Button
-                                    classes={this.classNames.numberButton}
+                                    className={this.classNames.numberButton}
                                     onClick={this.handleChangeValue}
                                 >7</Button>
                                 <Button
-                                    classes={this.classNames.numberButton}
+                                    className={this.classNames.numberButton}
                                     onClick={this.handleChangeValue}
                                 >8</Button>
                                 <Button
-                                    classes={this.classNames.numberButton}
+                                    className={this.classNames.numberButton}
                                     onClick={this.handleChangeValue}
                                 >9</Button>
                                 <Button
-                                    classes={this.classNames.buttonsCanBeDisabled.default}
+                                    className={this.classNames.buttonsCanBeDisabled.default}
                                     onClick={this.operation}>*</Button>
                             </div>
                             <div className='calculator__row'>
                                 <Button
-                                    classes={this.classNames.numberButton}
+                                    className={this.classNames.numberButton}
                                     onClick={this.handleChangeValue}
                                 >4</Button>
                                 <Button
-                                    classes={this.classNames.numberButton}
+                                    className={this.classNames.numberButton}
                                     onClick={this.handleChangeValue}
                                 >5</Button>
                                 <Button
-                                    classes={this.classNames.numberButton}
+                                    className={this.classNames.numberButton}
                                     onClick={this.handleChangeValue}
                                 >6</Button>
                                 <Button 
-                                    classes={this.classNames.buttonsCanBeDisabled.default}
+                                    className={this.classNames.buttonsCanBeDisabled.default}
                                     onClick={this.operation}
                                 >-</Button>
                             </div>
                             <div className='calculator__row'>
                                 <Button
-                                    classes={this.classNames.numberButton}
+                                    className={this.classNames.numberButton}
                                     onClick={this.handleChangeValue}
                                 >1</Button>
                                 <Button
-                                    classes={this.classNames.numberButton}
+                                    className={this.classNames.numberButton}
                                     onClick={this.handleChangeValue}
                                 >2</Button>
                                 <Button
-                                    classes={this.classNames.numberButton}
+                                    className={this.classNames.numberButton}
                                     onClick={this.handleChangeValue}
                                 >3</Button>
                                 <Button
-                                    classes={this.classNames.buttonsCanBeDisabled.default}
+                                    className={this.classNames.buttonsCanBeDisabled.default}
                                     onClick={this.operation}
                                 >+</Button>
                             </div>
                             <div className='calculator__row'>
                                 <Button
                                     onClick={this.reverse}
-                                    classes={this.classNames.buttonsCanBeDisabled.default}
+                                    className={this.classNames.buttonsCanBeDisabled.default}
                                 >±</Button>
                                 <Button
-                                    classes={this.classNames.numberButton}
+                                    className={this.classNames.numberButton}
                                     onClick={this.handleChangeValue}
                                 >0</Button>
                                 <Button
                                     onClick={this.addPoint}
-                                    classes={this.classNames.buttonsCanBeDisabled.default}>,</Button>
+                                    className={this.classNames.buttonsCanBeDisabled.default}>,</Button>
                                 <Button
                                     onClick={this.result}
-                                    classes={this.classNames.buttonsCanBeDisabled.default}
+                                    className={this.classNames.buttonsCanBeDisabled.default}
                                 >=</Button>
                             </div>
                             <Memory

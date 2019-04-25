@@ -4,20 +4,25 @@ import { MAX_WIDTH_DISPLAY } from '../../const';
 
 export default class HistoryDisplay extends Component {
     static propTypes = {
-        displayHistoryValue: PropTypes.string
+        displayHistoryValue: PropTypes.string,
+        clearPressed: PropTypes.bool
     }
 
     static defaultProps = {
-        displayHistoryValue: ''
+        displayHistoryValue: '',
+        clearPressed: false
     }
 
     constructor() {
         super();
         this.$smallDisplay = React.createRef();
+        this.state = {
+            makeReload: false
+        }
     }
 
     componentDidUpdate() {
-        if (this.$smallDisplay.current && this.$smallDisplay.current.scrollWidth > 300) {
+        if (this.$smallDisplay.current && this.$smallDisplay.current.scrollWidth > MAX_WIDTH_DISPLAY) {
             const width = this.$smallDisplay.current.scrollWidth;
 
             this.$smallDisplay.current.scrollTo(width, 0);
@@ -37,7 +42,9 @@ export default class HistoryDisplay extends Component {
     }
 
     renderLeftButton = () => {
-        if (this.$smallDisplay.current && this.$smallDisplay.current.scrollWidth > MAX_WIDTH_DISPLAY) {
+        const { clearPressed } = this.props;
+
+        if (!clearPressed && this.$smallDisplay.current && this.$smallDisplay.current.scrollWidth > MAX_WIDTH_DISPLAY) {
             return (
                 <div
                     onClick={this.btnMoveLeft}
@@ -50,7 +57,9 @@ export default class HistoryDisplay extends Component {
     }
 
     renderRightButton = () => {
-        if (this.$smallDisplay.current && this.$smallDisplay.current.scrollWidth > MAX_WIDTH_DISPLAY) {
+        const { clearPressed } = this.props;
+
+        if (!clearPressed && this.$smallDisplay.current && this.$smallDisplay.current.scrollWidth > MAX_WIDTH_DISPLAY) {
             return (
                 <div
                     onClick={this.btnMoveRight}

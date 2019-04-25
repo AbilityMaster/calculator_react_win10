@@ -1,23 +1,24 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+
 export default class Button extends Component {
     static propTypes = {
         onClick: PropTypes.func,
-        classes: PropTypes.string,
+        className: PropTypes.string,
     }
 
     static defaultProps = {
         onClick: () => {},
-        classes: ''
+        className: ''
     }
 
     render() {   
-        const { dataAttributes, onClick, classes } = this.props;
+        const { dataAttributes, onClick, className } = this.props;
         
         return (
             <div
                 onClick={onClick}
-                className={classes}
+                className={className}
                 data-type={dataAttributes}
             >{this.props.children}</div>
         )
