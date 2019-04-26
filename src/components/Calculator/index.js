@@ -13,17 +13,10 @@ export default class Calculator extends Component {
     constructor() {
         super();
         this.localStorage = new LocalStorage(projectInfo.version, projectInfo.name);
-        this.defaultSettings = {
-            mode: CALC_MODES.DEFAULT,
-            x: `${(window.innerWidth - 320) / window.innerWidth * 100}%`,
-            y: `${(window.innerHeight - 540) / window.innerHeight * 100}%`,
-            isDisabledMemoryButtons: true,
-            positionAttribute: 0,
-            memoryValues: []
-        }
         this.localStorage.dataset = this.localStorage.isEmpty ? this.defaultSettings : false;
+        const { isDisabledMemoryButtons, memoryValues, mode, positionAttribute, x, y } = this.localStorage.dataset;
         this.state = {
-            clearButtons: false,
+            isShowButtonsInHistoryDisplay: false,
             isDisabledOperations: false,
             isResultPressed: false,
             isOperationPressed: false,
@@ -41,18 +34,29 @@ export default class Calculator extends Component {
             isOpenMemoryWindow: false,
             historyValues: [],
             isDisabledMemoryButtonsAll: false,
-            isDisabledMemoryButtons: this.localStorage.dataset.isDisabledMemoryButtons,
-            memoryValues: this.localStorage.dataset.memoryValues,
-            mode: this.localStorage.dataset.mode,
-            positionAttribute: this.localStorage.dataset.positionAttribute,
+            isDisabledMemoryButtons,
+            memoryValues,
+            mode,
+            positionAttribute,
         };
         this.coords = {
-            x: this.localStorage.dataset.x,
-            y: this.localStorage.dataset.y
+            x,
+            y
         };
         this.$calculator = React.createRef();
     }
 
+    get defaultSettings() {
+        return {
+            mode: CALC_MODES.DEFAULT,
+            x: `${(window.innerWidth - 320) / window.innerWidth * 100}%`,
+            y: `${(window.innerHeight - 540) / window.innerHeight * 100}%`,
+            isDisabledMemoryButtons: true,
+            positionAttribute: 0,
+            memoryValues: []
+        }
+    }
+    
     clear = () => {
         const { isDisabledOperations } = this.state;
 
@@ -62,7 +66,7 @@ export default class Calculator extends Component {
         }
 
         this.setState({
-            clearButtons: true,
+            isShowButtonsInHistoryDisplay: false,
             isPressedSingleOperation: false,
             displayValue: '0',
             isDisabled: false,
@@ -79,7 +83,7 @@ export default class Calculator extends Component {
             isEnteredNewValue: true,
             historyValues: []
         }, () => {
-            this.setState({ clearButtons: false });
+            this.setState({ isShowButtonsInHistoryDisplay: true });
         });
     }
 
@@ -153,11 +157,11 @@ export default class Calculator extends Component {
 
         this.updateSmallDisplay();
         this.setState({
-            clearButtons: true,
+            isShowButtonsInHistoryDisplay: false,
             isEnteredNewValue: true,
             isPressedSingleOperation: false
         }, () => {
-            this.setState({ clearButtons: false });
+            this.setState({ isShowButtonsInHistoryDisplay: true });
         });
 
         if ((displayValue === '0' || (isNeedNewValueInDisplay) || (isResultPressed && displayValue !== '0.') || displayValue === MESSAGES.DIVIDE_BY_ZERO)) {
@@ -1100,7 +1104,7 @@ export default class Calculator extends Component {
                             <p className='calculator__option-title'>Обычный</p>
                         </div>
                         <HistoryDisplay
-                            clearPressed={clearButtons}
+                            isShowButton={clearButtons}
                             displayHistoryValue={displayHistoryValue}
                         />
                         <Display

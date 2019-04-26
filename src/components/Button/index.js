@@ -5,11 +5,13 @@ export default class Button extends Component {
     static propTypes = {
         onClick: PropTypes.func,
         className: PropTypes.string,
+        dataAttributes: PropTypes.string
     }
 
     static defaultProps = {
         onClick: () => {},
-        className: ''
+        className: '',
+        dataAttributes: ''
     }
 
     render() {   
