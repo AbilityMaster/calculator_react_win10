@@ -19,8 +19,6 @@ export default class Display extends Component {
 
         if (displayFontSize === STYLES.SMALL) {
             classNames.push('calculator__display_small');
-
-            return classNames.join(' ');
         }
 
         return classNames.join(' ');

@@ -25,8 +25,6 @@ export default class Memory extends Component {
 
         if (isOpen) {
             classNames.push('calculator__memory-board_visible');
-
-            return classNames.join(' ');
         }
 
         return classNames.join(' ');
@@ -35,7 +33,7 @@ export default class Memory extends Component {
     renderMemoryItems() {
         const { values, displayValue, updateLocalStorage, onClearMemoryItem, getTextDisplay } = this.props;
 
-        const memoryElements = values.map((memory) =>
+        return values.map((memory) =>
             <MemoryBlock
                 getTextDisplay={getTextDisplay}
                 onClearMemoryItem={onClearMemoryItem}
@@ -45,8 +43,6 @@ export default class Memory extends Component {
                 memory={memory}
             />
         );
-
-        return memoryElements;
     }
 
     render() {

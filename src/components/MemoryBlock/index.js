@@ -20,7 +20,13 @@ export default class MemoryBlock extends Component {
     constructor() {
         super();
         this.mouseOver = false;
-        this.state = { mouseOverMemoryItem: false };
+        this.state = {
+            mouseOverMemoryItem: false
+        }
+    }
+
+    shouldComponentUpdate() {
+        return true;
     }
 
     handleMouseOver = () => {
@@ -34,7 +40,7 @@ export default class MemoryBlock extends Component {
     plus = () => {
         const { updateLocalStorage, memory, getTextDisplay } = this.props;
 
-        memory.data = parseFloat(memory.data) + parseFloat(getTextDisplay());
+        memory.data = parseFloat(memory.data) + parseFloat(getTextDisplay);
         updateLocalStorage(memory);
         this.setState({ memoryData: memory.data});        
     }
@@ -42,9 +48,9 @@ export default class MemoryBlock extends Component {
     minus = () => {
         const { updateLocalStorage, memory, getTextDisplay} = this.props;
 
-        memory.data = parseFloat(memory.data) - parseFloat(getTextDisplay());
+        memory.data = parseFloat(memory.data) - parseFloat(getTextDisplay);
         updateLocalStorage(memory);
-        this.setState({ memoryData: memory.data});    
+        this.setState({ memoryData: memory.data });    
     }
 
     clear = () => {
