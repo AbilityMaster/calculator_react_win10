@@ -13,8 +13,6 @@ export default class Calculator extends Component {
     constructor() {
         super();
         this.localStorage = new LocalStorage(projectInfo.version, projectInfo.name);
-        const isLCEmpty = this.localStorage.isEmpty;
-        const { isDisabledMemoryButtons, memoryValues, mode, positionAttribute } = this.localStorage.dataset;
         this.defaultSettings = {
             mode: CALC_MODES.DEFAULT,
             x: `${(window.innerWidth - 320) / window.innerWidth * 100}%`,
@@ -23,7 +21,7 @@ export default class Calculator extends Component {
             positionAttribute: 0,
             memoryValues: []
         }
-        this.localStorage.dataset = isLCEmpty ? this.defaultSettings : this.localStorage.dataset;
+        this.localStorage.dataset = this.localStorage.isEmpty ? this.defaultSettings : false;
         this.state = {
             clearButtons: false,
             isDisabledOperations: false,
@@ -43,14 +41,14 @@ export default class Calculator extends Component {
             isOpenMemoryWindow: false,
             historyValues: [],
             isDisabledMemoryButtonsAll: false,
-            isDisabledMemoryButtons: isLCEmpty ? true : isDisabledMemoryButtons,
-            memoryValues: isLCEmpty ? [] : memoryValues,
-            mode: isLCEmpty ? CALC_MODES.DEFAULT : mode,
-            positionAttribute: isLCEmpty ? 0 : positionAttribute,
+            isDisabledMemoryButtons: this.localStorage.dataset.isDisabledMemoryButtons,
+            memoryValues: this.localStorage.dataset.memoryValues,
+            mode: this.localStorage.dataset.mode,
+            positionAttribute: this.localStorage.dataset.positionAttribute,
         };
         this.coords = {
-            x: isLCEmpty ? this.defaultSettings.x : this.localStorage.dataset.x,
-            y: isLCEmpty ? this.defaultSettings.y : this.localStorage.dataset.y
+            x: this.localStorage.dataset.x,
+            y: this.localStorage.dataset.y
         };
         this.$calculator = React.createRef();
     }
@@ -726,6 +724,7 @@ export default class Calculator extends Component {
 
     get classForState() {
         const { mode } = this.state;
+
         const classNames = {
             calc: ['calculator'],
             calcBody: ['calculator__body'],

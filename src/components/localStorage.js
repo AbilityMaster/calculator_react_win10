@@ -5,7 +5,7 @@ class LocalStorage {
 
 	set dataset(obj) {
 		let temp = JSON.parse(localStorage.getItem(this.key));
-	
+
 		if (temp) {
 			for (let key in temp) {
 				if (!temp.hasOwnProperty(key)) {
